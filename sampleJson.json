@@ -1,0 +1,26 @@
+[
+  {
+    "categoryName": "Kesim Bıçakları",
+    "categoryId": 1
+  },
+  {
+    "categoryName": "Çakı",
+    "categoryId": 2
+  },
+  {
+    "categoryName": "Avcı Bıçakları",
+    "categoryId": 3
+  },
+  {
+    "categoryName": "Kılıç",
+    "categoryId": 4
+  },
+  {
+    "categoryName": "Mutfak Bıçakları",
+    "categoryId": 5
+  },
+  {
+    "categoryName": "Balta",
+    "categoryId": 6
+  }
+]
