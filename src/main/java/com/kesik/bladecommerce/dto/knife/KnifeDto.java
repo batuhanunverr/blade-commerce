@@ -1,23 +1,27 @@
-package com.kesik.bladecommerce.model.Knife;
+package com.kesik.bladecommerce.dto.knife;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
 
-import lombok.Getter;
-import org.springframework.data.mongodb.core.mapping.Document;
-
 @Document(collection = "knives")
-public class Knife {
+public class KnifeDto {
+
+    @Id
     private String id;
+
     private String name;
     private Integer categoryId;
     private String description;
     private double price;
     private double discountPrice;
-    private KnifeDetails knifeDetails;
     private int stockQuantity;
     private List<String> tags;
     private String imageUrl;
 
+    private KnifeDetails knifeDetails;
+
+    // Getters & Setters
     public String getId() {
         return id;
     }
@@ -66,14 +70,6 @@ public class Knife {
         this.discountPrice = discountPrice;
     }
 
-    public KnifeDetails getKnifeDetails() {
-        return knifeDetails;
-    }
-
-    public void setKnifeDetails(KnifeDetails knifeDetails) {
-        this.knifeDetails = knifeDetails;
-    }
-
     public int getStockQuantity() {
         return stockQuantity;
     }
@@ -98,4 +94,61 @@ public class Knife {
         this.imageUrl = imageUrl;
     }
 
+    public KnifeDetails getKnifeDetails() {
+        return knifeDetails;
+    }
+
+    public void setKnifeDetails(KnifeDetails knifeDetails) {
+        this.knifeDetails = knifeDetails;
+    }
+}
+
+class KnifeDetails {
+
+    private String knifeType;
+    private double bladeLength;
+    private String color;
+    private String bladeMaterial;
+    private String handleMaterial;
+
+    // Getters & Setters
+    public String getKnifeType() {
+        return knifeType;
+    }
+
+    public void setKnifeType(String knifeType) {
+        this.knifeType = knifeType;
+    }
+
+    public double getBladeLength() {
+        return bladeLength;
+    }
+
+    public void setBladeLength(double bladeLength) {
+        this.bladeLength = bladeLength;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    public String getBladeMaterial() {
+        return bladeMaterial;
+    }
+
+    public void setBladeMaterial(String bladeMaterial) {
+        this.bladeMaterial = bladeMaterial;
+    }
+
+    public String getHandleMaterial() {
+        return handleMaterial;
+    }
+
+    public void setHandleMaterial(String handleMaterial) {
+        this.handleMaterial = handleMaterial;
+    }
 }

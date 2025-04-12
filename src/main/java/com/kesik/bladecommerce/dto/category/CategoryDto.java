@@ -1,8 +1,8 @@
-package com.kesik.bladecommerce.dto.Category;
+package com.kesik.bladecommerce.dto.category;
 
 import lombok.Data;
 @Data
 public class CategoryDto {
-    private String id;
+    private Integer id;
     private String name;
 }

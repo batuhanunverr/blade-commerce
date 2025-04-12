@@ -1,9 +1,9 @@
-package com.kesik.bladecommerce.model.Knife;
+package com.kesik.bladecommerce.dto.knife;
 
 import lombok.Data;
 
 @Data
-public class KnifeDetails {
+public class KnifeDetailsDto {
     private String knifeType;
     private double bladeLength;
     private String color;

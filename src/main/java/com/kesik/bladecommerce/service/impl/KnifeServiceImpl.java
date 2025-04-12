@@ -1,58 +1,56 @@
 package com.kesik.bladecommerce.service.impl;
 
-import com.kesik.bladecommerce.model.Knife.Knife;
+import com.kesik.bladecommerce.dto.knife.KnifeDto;
+import com.kesik.bladecommerce.repository.knife.KnifeRepository;
 import com.kesik.bladecommerce.service.KnifeService;
+import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
+@Service
 public class KnifeServiceImpl implements KnifeService {
+    private final KnifeRepository knifeRepository;
 
-    private List<Knife> knifeRepository = new ArrayList<>();
-
-    @Override
-    public List<Knife> getAllKnives() {
-        return knifeRepository;
+    public KnifeServiceImpl(KnifeRepository knifeRepository) {
+        this.knifeRepository = knifeRepository;
     }
 
     @Override
-    public List<Knife> getKnivesByName(String name, int page, int size) {
-        return knifeRepository.stream()
-                .filter(knife -> knife.getName().toLowerCase().contains(name.toLowerCase()))
-                .skip((long) page * size)
-                .limit(size)
-                .collect(Collectors.toList());
+    public List<KnifeDto> getAllKnives() {
+        return knifeRepository.findAll();
+    }
+    @Override
+    public List<KnifeDto> searchKnives(String searchTerm) {
+        return knifeRepository.searchKnives(searchTerm);
+    }
+    @Override
+    public KnifeDto getKnifeById(String id) {
+        return knifeRepository.findById(id).orElse(null);
+    }
+    @Override
+    public KnifeDto getKnifeByName(String name) {
+        return knifeRepository.getKnifeByName(name);
+    }
+    @Override
+    public KnifeDto addKnife(KnifeDto knifeDto) {
+        return knifeRepository.save(knifeDto);
     }
 
     @Override
-    public List<Knife> getKnivesByType(String type, int page, int size) {
-        return knifeRepository.stream()
-                .filter(knife -> knife.getKnifeDetails().getKnifeType().equalsIgnoreCase(type))
-                .skip((long) page * size)
-                .limit(size)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public Knife createKnife(Knife knife) {
-        knifeRepository.add(knife);
-        return knife;
-    }
-
-    @Override
-    public Knife updateKnife(String id, Knife knife) {
-        for (int i = 0; i < knifeRepository.size(); i++) {
-            if (knifeRepository.get(i).getId().equals(id)) {
-                knifeRepository.set(i, knife);
-                return knife;
-            }
+    public KnifeDto updateKnife(KnifeDto knifeDto) {
+        KnifeDto existingKnife = knifeRepository.findById(knifeDto.getId()).orElse(null);
+        if (existingKnife != null) {
+            existingKnife.setName(knifeDto.getName());
+            existingKnife.setDescription(knifeDto.getDescription());
+            existingKnife.setPrice(knifeDto.getPrice());
+            existingKnife.setCategoryId(knifeDto.getCategoryId());
+            existingKnife.setTags(knifeDto.getTags());
+            return knifeRepository.save(existingKnife);
         }
         return null;
     }
-
     @Override
     public void deleteKnife(String id) {
-        knifeRepository.removeIf(knife -> knife.getId().equals(id));
+        knifeRepository.deleteById(id);
     }
 }

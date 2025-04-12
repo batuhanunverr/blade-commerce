@@ -1,9 +1,9 @@
-package com.kesik.bladecommerce.model.User;
+package com.kesik.bladecommerce.dto.user;
 
 import lombok.Data;
 
 @Data
-public class Admin {
+public class AdminDto {
     private String id;
     private String name;
     private String email;

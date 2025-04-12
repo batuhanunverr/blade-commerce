@@ -1,17 +1,17 @@
-package com.kesik.bladecommerce.model.Order;
+package com.kesik.bladecommerce.dto.order;
 
-import com.kesik.bladecommerce.model.Knife.Knife;
+import com.kesik.bladecommerce.dto.knife.KnifeDto;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-public class Order {
+public class OrderDto {
     private String id;
     private String orderDate;
     private String orderStatus;
     private String shippingAddress;
     private String billingAddress;
     private Double totalAmount;
-    private List<Knife> knife;
+    private List<KnifeDto> knife;
 }
