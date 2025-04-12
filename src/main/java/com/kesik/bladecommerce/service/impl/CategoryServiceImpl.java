@@ -3,9 +3,11 @@ package com.kesik.bladecommerce.service.impl;
 import com.kesik.bladecommerce.dto.category.CategoryDto;
 import com.kesik.bladecommerce.repository.category.CategoryRepository;
 import com.kesik.bladecommerce.service.CategoryService;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
 
