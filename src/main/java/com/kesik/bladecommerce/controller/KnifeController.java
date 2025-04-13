@@ -1,4 +1,4 @@
-package com.kesik.bladecommerce.controller.knife;
+package com.kesik.bladecommerce.controller;
 
 import com.kesik.bladecommerce.dto.knife.KnifeDto;
 import com.kesik.bladecommerce.service.KnifeService;
@@ -21,8 +21,10 @@ public class KnifeController {
         return knifeService.getAllKnives();
     }
     @GetMapping(path = "/search")
-    public List<KnifeDto> searchKnives(@RequestParam String searchTerm) {
-        return knifeService.searchKnives(searchTerm);
+    public List<KnifeDto> searchKnives(@RequestParam String searchTerm,
+                                       @RequestParam int page,
+                                       @RequestParam int size) {
+        return knifeService.searchKnives(searchTerm, page, size);
     }
     @GetMapping(path = "/getKnifeById")
     public KnifeDto getKnifeById(@RequestParam String id) {

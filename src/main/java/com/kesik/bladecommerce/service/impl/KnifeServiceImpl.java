@@ -3,6 +3,8 @@ package com.kesik.bladecommerce.service.impl;
 import com.kesik.bladecommerce.dto.knife.KnifeDto;
 import com.kesik.bladecommerce.repository.knife.KnifeRepository;
 import com.kesik.bladecommerce.service.KnifeService;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,8 +22,9 @@ public class KnifeServiceImpl implements KnifeService {
         return knifeRepository.findAll();
     }
     @Override
-    public List<KnifeDto> searchKnives(String searchTerm) {
-        return knifeRepository.searchKnives(searchTerm);
+    public List<KnifeDto> searchKnives(String searchTerm, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return knifeRepository.searchKnives(searchTerm, pageable).getContent();
     }
     @Override
     public KnifeDto getKnifeById(String id) {

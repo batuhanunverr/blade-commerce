@@ -6,7 +6,8 @@ import java.util.List;
 
 public interface KnifeService {
     List<KnifeDto> getAllKnives();
-    List<KnifeDto> searchKnives(String searchTerm);
+
+    List<KnifeDto> searchKnives(String searchTerm, int page, int size);
 
     KnifeDto getKnifeById(String id);
 

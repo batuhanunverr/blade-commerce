@@ -21,8 +21,8 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CategoryDto getCategoryById(Integer id) {
-        return categoryRepository.findById(String.valueOf(id)).orElse(null);
+    public CategoryDto getCategoryById(Integer categoryId) {
+        return categoryRepository.findByCategoryId(categoryId).orElse(null);
     }
 
     @Override
@@ -32,16 +32,16 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryDto updateCategory(CategoryDto categoryDto) {
-        CategoryDto existingCategory = categoryRepository.findById(String.valueOf(categoryDto.getId())).orElse(null);
+        CategoryDto existingCategory = categoryRepository.findById(String.valueOf(categoryDto.getCategoryId())).orElse(null);
         if (existingCategory != null) {
-            existingCategory.setName(categoryDto.getName());
+            existingCategory.setCategoryName(categoryDto.getCategoryName());
             return categoryRepository.save(existingCategory);
         }
         return null;
     }
 
     @Override
-    public void deleteCategory(Integer id) {
-        categoryRepository.deleteById(String.valueOf(id));
+    public void deleteCategory(Integer categoryId) {
+        categoryRepository.deleteByCategoryId(categoryId);
     }
 }

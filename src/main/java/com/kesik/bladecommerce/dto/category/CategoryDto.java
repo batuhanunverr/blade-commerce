@@ -1,26 +1,31 @@
 package com.kesik.bladecommerce.dto.category;
 
-
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "knife_categories")
 public class CategoryDto {
-    private Integer id;
-    private String name;
+    private String  id;
+    private String categoryName;
+    private Integer categoryId;
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(String id) {
         this.id = id;
     }
-
-    public String getName() {
-        return name;
+    public String getCategoryName() {
+        return categoryName;
+    }
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
+    public Integer getCategoryId() {
+        return categoryId;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setCategoryId(Integer categoryId) {
+        this.categoryId = categoryId;
     }
 }

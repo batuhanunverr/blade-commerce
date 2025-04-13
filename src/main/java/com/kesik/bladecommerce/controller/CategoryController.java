@@ -1,7 +1,6 @@
-package com.kesik.bladecommerce.controller.category;
+package com.kesik.bladecommerce.controller;
 
 import com.kesik.bladecommerce.dto.category.CategoryDto;
-import com.kesik.bladecommerce.dto.knife.KnifeDto;
 import com.kesik.bladecommerce.service.CategoryService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,8 +20,8 @@ public class CategoryController {
         return categoryService.getAllCategories();
     }
     @GetMapping(path = "/getCategoryById")
-    public CategoryDto getCategoryById(Integer id) {
-        return categoryService.getCategoryById(id);
+    public CategoryDto getCategoryById(Integer categoryId) {
+        return categoryService.getCategoryById(categoryId);
     }
     @GetMapping(path = "/addCategory")
     public CategoryDto addCategory(CategoryDto categoryDto) {
@@ -33,7 +32,7 @@ public class CategoryController {
         return categoryService.updateCategory(categoryDto);
     }
     @GetMapping(path = "/deleteCategory")
-    public void deleteCategory(Integer id) {
-        categoryService.deleteCategory(id);
+    public void deleteCategory(Integer categoryId) {
+        categoryService.deleteCategory(categoryId);
     }
 }
