@@ -19,5 +19,4 @@ public interface OrderService {
 
     List<OrderDto> getOrdersByStatus(String orderStatus);
 
-    List<OrderDto> searchOrders(String searchTerm, int page, int size);
-}
+    List<OrderDto> searchOrders(String searchTerm, int page, int size, Optional<String> startDate, Optional<String> endDate);}

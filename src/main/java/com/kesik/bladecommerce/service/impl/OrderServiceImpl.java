@@ -7,6 +7,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -57,8 +59,12 @@ public class OrderServiceImpl implements OrderService {
         return orderRepository.findByOrderStatus(orderStatus);
     }
     @Override
-    public List<OrderDto> searchOrders(String searchTerm, int page, int size) {
+    public List<OrderDto> searchOrders(String searchTerm, int page, int size, Optional<String> startDate, Optional<String> endDate) {
         Pageable pageable = PageRequest.of(page, size);
-        return orderRepository.searchOrders(searchTerm, pageable).getContent();
+
+        String start = startDate.orElse(null);
+        String end = endDate.orElse(null);
+
+        return orderRepository.searchOrders(searchTerm, start, end, pageable).getContent();
     }
 }

@@ -14,6 +14,9 @@ public interface OrderRepository extends MongoRepository<OrderDto, String> {
 
     List<OrderDto> findByOrderStatus(String orderStatus);
 
-    @Query("{ $or: [ { 'knife.name': { $regex: ?0, $options: 'i' } }, { 'knife.description': { $regex: ?0, $options: 'i' } } ] }")
-    Page<OrderDto> searchOrders(String searchTerm, Pageable pageable);
-}
+    @Query("{ $and: [ " +
+            "{ $or: [ { 'knife.name': { $regex: ?0, $options: 'i' } }, { 'knife.description': { $regex: ?0, $options: 'i' } } ] }, " +
+            "{ $or: [ { ?1: null }, { 'orderDate': { $gte: ?1 } } ] }, " +
+            "{ $or: [ { ?2: null }, { 'orderDate': { $lte: ?2 } } ] } " +
+            "] }")
+    Page<OrderDto> searchOrders(String searchTerm, String startDate, String endDate, Pageable pageable);}

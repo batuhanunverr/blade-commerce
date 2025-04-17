@@ -2,9 +2,10 @@ package com.kesik.bladecommerce.dto.order;
 
 import com.kesik.bladecommerce.dto.knife.KnifeDto;
 import lombok.Data;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
-
+@Document(collection = "orders")
 public class OrderDto {
     private String id;
     private String orderDate;
@@ -13,7 +14,7 @@ public class OrderDto {
     private String billingAddress;
     private Double totalAmount;
     private List<KnifeDto> knife;
-
+    private String history;
     public String getId() {
         return id;
     }
@@ -68,5 +69,11 @@ public class OrderDto {
 
     public void setKnife(List<KnifeDto> knife) {
         this.knife = knife;
+    }
+    public String getHistory() {
+        return history;
+    }
+    public void setHistory(String history) {
+        this.history = history;
     }
 }
