@@ -7,7 +7,8 @@ import java.util.List;
 public interface KnifeService {
     List<KnifeDto> getAllKnives();
 
-    List<KnifeDto> searchKnives(String searchTerm, int page, int size);
+    List<KnifeDto> searchKnives(String searchTerm, Integer categoryId, Double minPrice, Double maxPrice,
+                                String knifeType, String bladeMaterial, String sortDirection, int page, int size);
 
     KnifeDto getKnifeById(String id);
 
@@ -18,4 +19,6 @@ public interface KnifeService {
     KnifeDto updateKnife(KnifeDto knifeDto);
 
     void deleteKnife(String id);
+
+    List<String> getKnifeTypes();
 }

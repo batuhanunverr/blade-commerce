@@ -1,6 +1,8 @@
 package com.kesik.bladecommerce.service;
 
 import com.kesik.bladecommerce.dto.order.OrderDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,4 +21,7 @@ public interface OrderService {
 
     List<OrderDto> getOrdersByStatus(String orderStatus);
 
-    List<OrderDto> searchOrders(String searchTerm, int page, int size, Optional<String> startDate, Optional<String> endDate);}
+    Page<OrderDto> searchOrders(String searchTerm, String minPrice, String maxPrice, String startDate, String endDate,
+                                int sortDirection, String status, Pageable pageable);
+
+}

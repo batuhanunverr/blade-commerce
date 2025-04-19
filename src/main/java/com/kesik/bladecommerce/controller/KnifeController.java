@@ -21,10 +21,16 @@ public class KnifeController {
         return knifeService.getAllKnives();
     }
     @GetMapping(path = "/search")
-    public List<KnifeDto> searchKnives(@RequestParam String searchTerm,
+    public List<KnifeDto> searchKnives(@RequestParam(required = false) String searchTerm,
+                                       @RequestParam(required = false) Integer categoryId,
+                                       @RequestParam(required = false) Double minPrice,
+                                       @RequestParam(required = false) Double maxPrice,
+                                       @RequestParam(required = false) String knifeType,
+                                       @RequestParam(required = false) String bladeMaterial,
+                                       @RequestParam(defaultValue = "asc") String sortDirection,
                                        @RequestParam int page,
                                        @RequestParam int size) {
-        return knifeService.searchKnives(searchTerm, page, size);
+        return knifeService.searchKnives(searchTerm, categoryId, minPrice, maxPrice, knifeType, bladeMaterial, sortDirection, page, size);
     }
     @GetMapping(path = "/getKnifeById")
     public KnifeDto getKnifeById(@RequestParam String id) {
@@ -45,5 +51,9 @@ public class KnifeController {
     @DeleteMapping(path = "/deleteKnife")
     public void deleteKnife(@RequestParam String id) {
         knifeService.deleteKnife(id);
+    }
+    @GetMapping(path = "/getKnifeTypes")
+    public List<String> getKnifeTypes() {
+        return knifeService.getKnifeTypes();
     }
 }
