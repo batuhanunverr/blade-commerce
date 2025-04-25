@@ -31,7 +31,7 @@ public class KnifeServiceImpl implements KnifeService {
     @Override
     public List<KnifeDto> searchKnives(String searchTerm, Integer categoryId, Double minPrice, Double maxPrice,
                                        String knifeType, String bladeMaterial, String sortDirection, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, sortDirection.equalsIgnoreCase("asc") ? Sort.by("price").ascending() : Sort.by("price").descending());
+        Pageable pageable = PageRequest.of(page-1, size, sortDirection.equalsIgnoreCase("asc") ? Sort.by("price").ascending() : Sort.by("price").descending());
 
         // Criteria ile sorgu oluştur
         List<Criteria> criteriaList = new ArrayList<>();

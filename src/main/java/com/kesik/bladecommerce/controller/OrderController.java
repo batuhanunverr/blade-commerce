@@ -71,9 +71,9 @@ public class OrderController {
                                        @RequestParam(required = false) String endDate,
                                        @RequestParam(required = false, defaultValue = "1") int sortDirection,
                                        @RequestParam(required = false) String status,
-                                       @RequestParam(defaultValue = "0") int page,
+                                       @RequestParam(defaultValue = "1") int page, // Varsayılan 1. sayfa
                                        @RequestParam(defaultValue = "10") int size) {
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page - 1, size);
         return orderService.searchOrders(searchTerm, minPrice, maxPrice, startDate, endDate, sortDirection, status, pageable);
     }
 }
