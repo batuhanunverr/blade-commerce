@@ -1,7 +1,9 @@
 package com.kesik.bladecommerce.service.impl;
 
+import com.kesik.bladecommerce.dto.knife.AddKnifeRequestDto;
 import com.kesik.bladecommerce.dto.knife.KnifeDto;
 import com.kesik.bladecommerce.repository.knife.KnifeRepository;
+import com.kesik.bladecommerce.service.CloudinaryService;
 import com.kesik.bladecommerce.service.KnifeService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -11,6 +13,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,10 +21,12 @@ import java.util.List;
 public class KnifeServiceImpl implements KnifeService {
     private final KnifeRepository knifeRepository;
     private final MongoTemplate mongoTemplate;
+    private final CloudinaryService cloudinaryService;
 
-    public KnifeServiceImpl(KnifeRepository knifeRepository, MongoTemplate mongoTemplate) {
+    public KnifeServiceImpl(KnifeRepository knifeRepository, MongoTemplate mongoTemplate, CloudinaryService cloudinaryService) {
         this.knifeRepository = knifeRepository;
         this.mongoTemplate = mongoTemplate;
+        this.cloudinaryService = cloudinaryService;
     }
 
     @Override
@@ -75,8 +80,25 @@ public class KnifeServiceImpl implements KnifeService {
         return knifeRepository.getKnifeByName(name);
     }
     @Override
-    public KnifeDto addKnife(KnifeDto knifeDto) {
-        return knifeRepository.save(knifeDto);
+    public KnifeDto addKnife(AddKnifeRequestDto knifeDto) {
+        KnifeDto newKnife = new KnifeDto();
+        newKnife.setName(knifeDto.getName());
+        newKnife.setDescription(knifeDto.getDescription());
+        newKnife.setPrice(knifeDto.getPrice());
+        newKnife.setCategoryId(knifeDto.getCategoryId());
+        newKnife.setTags(knifeDto.getTags());
+        newKnife.setStockQuantity(knifeDto.getStockQuantity());
+        newKnife.setDiscountPrice(knifeDto.getDiscountPrice());
+        newKnife.setKnifeType(knifeDto.getKnifeType());
+        newKnife.setBladeMaterial(knifeDto.getBladeMaterial());
+        newKnife.setHandleMaterial(knifeDto.getHandleMaterial());
+        newKnife.setBladeLength(knifeDto.getBladeLength());
+        try {
+            newKnife.setImageUrl(cloudinaryService.uploadFile(knifeDto.getImageFile()));
+        } catch (IOException e) {
+            throw new RuntimeException("error uploading image to server " + e);
+        }
+        return knifeRepository.save(newKnife);
     }
 
     @Override
@@ -102,9 +124,7 @@ public class KnifeServiceImpl implements KnifeService {
         List<KnifeDto> knives = knifeRepository.findAll();
         List<String> knifeTypes = new ArrayList<>();
         for (KnifeDto knife : knives) {
-            if (knife.getKnifeDetails() != null && knife.getKnifeDetails().getKnifeType() != null) {
-                knifeTypes.add(knife.getKnifeDetails().getKnifeType().toLowerCase());
-            }
+          knifeTypes.add(knife.getKnifeType());
         }
         return knifeTypes.stream().distinct().toList();
     }

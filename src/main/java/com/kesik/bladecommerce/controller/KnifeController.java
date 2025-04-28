@@ -1,5 +1,6 @@
 package com.kesik.bladecommerce.controller;
 
+import com.kesik.bladecommerce.dto.knife.AddKnifeRequestDto;
 import com.kesik.bladecommerce.dto.knife.KnifeDto;
 import com.kesik.bladecommerce.service.KnifeService;
 import org.springframework.web.bind.annotation.*;
@@ -41,7 +42,7 @@ public class KnifeController {
         return knifeService.getKnifeByName(name);
     }
     @PostMapping(path = "/addKnife")
-    public KnifeDto addKnife(@RequestBody KnifeDto knifeDto) {
+    public KnifeDto addKnife(@ModelAttribute AddKnifeRequestDto knifeDto) {
         return knifeService.addKnife(knifeDto);
     }
     @PostMapping(path = "/updateKnife")

@@ -1,5 +1,6 @@
 package com.kesik.bladecommerce.service;
 
+import com.kesik.bladecommerce.dto.knife.AddKnifeRequestDto;
 import com.kesik.bladecommerce.dto.knife.KnifeDto;
 
 import java.util.List;
@@ -14,7 +15,7 @@ public interface KnifeService {
 
     KnifeDto getKnifeByName(String name);
 
-    KnifeDto addKnife(KnifeDto knifeDto);
+    KnifeDto addKnife(AddKnifeRequestDto knifeDto);
 
     KnifeDto updateKnife(KnifeDto knifeDto);
 

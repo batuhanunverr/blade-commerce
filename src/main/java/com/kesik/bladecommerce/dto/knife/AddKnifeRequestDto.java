@@ -1,15 +1,11 @@
 package com.kesik.bladecommerce.dto.knife;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-@Document(collection = "knives")
-public class KnifeDto {
-
-    @Id
-    private String id;
-
+public class AddKnifeRequestDto {
+    private MultipartFile imageFile; // For file upload
     private String name;
     private Integer categoryId;
     private String description;
@@ -17,20 +13,18 @@ public class KnifeDto {
     private double discountPrice;
     private int stockQuantity;
     private List<String> tags;
-    private String imageUrl;
     private String knifeType;
     private double bladeLength;
     private String color;
     private String bladeMaterial;
     private String handleMaterial;
 
-    // Getters & Setters
-    public String getId() {
-        return id;
+    public MultipartFile getImageFile() {
+        return imageFile;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setImageFile(MultipartFile imageFile) {
+        this.imageFile = imageFile;
     }
 
     public String getName() {
@@ -89,14 +83,6 @@ public class KnifeDto {
         this.tags = tags;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-
     public String getKnifeType() {
         return knifeType;
     }
@@ -137,4 +123,3 @@ public class KnifeDto {
         this.handleMaterial = handleMaterial;
     }
 }
-
