@@ -27,6 +27,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryDto addCategory(CategoryDto categoryDto) {
+        categoryDto.setCategoryId(categoryRepository.findAll().size() + 1);
         return categoryRepository.save(categoryDto);
     }
 
