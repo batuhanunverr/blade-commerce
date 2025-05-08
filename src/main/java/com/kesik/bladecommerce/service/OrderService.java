@@ -24,4 +24,5 @@ public interface OrderService {
     Page<OrderDto> searchOrders(String searchTerm, String minPrice, String maxPrice, String startDate, String endDate,
                                 int sortDirection, String status, Pageable pageable);
 
+    OrderDto updateOrderStatus(String id, String orderStatus);
 }

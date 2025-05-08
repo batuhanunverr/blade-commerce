@@ -43,6 +43,11 @@ public class OrderController {
         return orderService.updateOrder(orderDto);
     }
 
+    @GetMapping(path = "/updateOrderStatus")
+    public OrderDto updateOrderStatus(String id, String orderStatus) {
+        return orderService.updateOrderStatus(id, orderStatus);
+    }
+
     @PostMapping(path = "/deleteOrder")
     public void deleteOrder(String id) {
         orderService.deleteOrder(id);

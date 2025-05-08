@@ -109,4 +109,14 @@ public class OrderServiceImpl implements OrderService {
 
         return PageableExecutionUtils.getPage(orders, pageable, () -> count);
     }
+
+    @Override
+    public OrderDto updateOrderStatus(String id, String orderStatus) {
+        OrderDto existingOrder = orderRepository.findById(id).orElse(null);
+        if (existingOrder != null) {
+            existingOrder.setOrderStatus(orderStatus);
+            return orderRepository.save(existingOrder);
+        }
+        return null;
+    }
 }
