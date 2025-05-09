@@ -1,7 +1,11 @@
 package com.kesik.bladecommerce.controller;
 
+import com.kesik.bladecommerce.dto.iyzico.OrderRequestDto;
 import com.kesik.bladecommerce.dto.knife.KnifeDto;
+import com.kesik.bladecommerce.dto.order.AddOrderDto;
 import com.kesik.bladecommerce.dto.order.OrderDto;
+import com.kesik.bladecommerce.dto.order.OrderKnifeDto;
+import com.kesik.bladecommerce.dto.order.OrderStatusDto;
 import com.kesik.bladecommerce.service.KnifeService;
 import com.kesik.bladecommerce.service.OrderService;
 import org.springframework.data.domain.Page;
@@ -17,35 +21,28 @@ import java.util.Optional;
 @RequestMapping("/api/orders")
 public class OrderController {
     private final OrderService orderService;
-    private final KnifeService knifeService;
 
-    public OrderController(OrderService orderService, KnifeService knifeService) {
+    public OrderController(OrderService orderService) {
         this.orderService = orderService;
-        this.knifeService = knifeService;
     }
 
     @PostMapping(path = "/addOrder")
-    public OrderDto addOrder(@RequestBody OrderDto orderDto) {
-        List<KnifeDto> fullKnifeList = new ArrayList<>();
-
-        for (KnifeDto knife : orderDto.getKnife()) {
-            KnifeDto fullKnife = knifeService.getKnifeById(knife.getId());
-            fullKnife.setStockQuantity(fullKnife.getStockQuantity() - 1);
-            knifeService.updateKnife(fullKnife);
-            fullKnifeList.add(fullKnife);
+    public OrderDto addOrder(@RequestBody OrderRequestDto orderDto) {
+        try {
+            return orderService.addOrder(orderDto);
+        }catch (Exception e){
+            throw new RuntimeException("Error mapping OrderRequest to Order: " + e.getMessage(), e);
         }
-        orderDto.setKnife(fullKnifeList);
-        return orderService.addOrder(orderDto);
     }
 
-    @PostMapping(path = "/updateOrder")
-    public OrderDto updateOrder(OrderDto orderDto) {
-        return orderService.updateOrder(orderDto);
+    @GetMapping(path = "/updateOrder")
+    public OrderDto updateOrder(String id, int orderStatus, String history) {
+        return orderService.updateOrder(id, orderStatus, history);
     }
 
-    @GetMapping(path = "/updateOrderStatus")
-    public OrderDto updateOrderStatus(String id, String orderStatus) {
-        return orderService.updateOrderStatus(id, orderStatus);
+    @GetMapping(path = "/getAllOrderStatus")
+    public List<OrderStatusDto> getAllOrderStatus() {
+        return orderService.getAllOrderStatus();
     }
 
     @PostMapping(path = "/deleteOrder")
@@ -64,7 +61,7 @@ public class OrderController {
     }
 
     @GetMapping(path = "/getOrdersByStatus")
-    public List<OrderDto> getOrdersByStatus(String orderStatus) {
+    public List<OrderDto> getOrdersByStatus(int orderStatus) {
         return orderService.getOrdersByStatus(orderStatus);
     }
 
@@ -76,7 +73,7 @@ public class OrderController {
                                        @RequestParam(required = false) String endDate,
                                        @RequestParam(required = false, defaultValue = "1") int sortDirection,
                                        @RequestParam(required = false) String status,
-                                       @RequestParam(defaultValue = "1") int page, // Varsayılan 1. sayfa
+                                       @RequestParam(defaultValue = "1") int page,
                                        @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
         return orderService.searchOrders(searchTerm, minPrice, maxPrice, startDate, endDate, sortDirection, status, pageable);

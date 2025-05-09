@@ -1,9 +1,17 @@
 package com.kesik.bladecommerce.service.impl;
 
+import com.kesik.bladecommerce.dto.iyzico.OrderRequestDto;
 import com.kesik.bladecommerce.dto.knife.KnifeDto;
+import com.kesik.bladecommerce.dto.order.AddOrderDto;
 import com.kesik.bladecommerce.dto.order.OrderDto;
+import com.kesik.bladecommerce.dto.order.OrderKnifeDto;
+import com.kesik.bladecommerce.dto.order.OrderStatusDto;
+import com.kesik.bladecommerce.mapper.OrderMapper;
 import com.kesik.bladecommerce.repository.order.OrderRepository;
+import com.kesik.bladecommerce.service.KnifeService;
 import com.kesik.bladecommerce.service.OrderService;
+import com.kesik.bladecommerce.util.OrderStatusHolder;
+import jakarta.annotation.PostConstruct;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,35 +24,41 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final MongoTemplate mongoTemplate;
+    private final KnifeService knifeService;
+    private final OrderStatusHolder orderStatusHolder;
 
-    public OrderServiceImpl(OrderRepository orderRepository, MongoTemplate mongoTemplate) {
+    public OrderServiceImpl(OrderRepository orderRepository, MongoTemplate mongoTemplate, KnifeService knifeService, OrderStatusHolder orderStatusHolder) {
         this.orderRepository = orderRepository;
         this.mongoTemplate = mongoTemplate;
+        this.knifeService = knifeService;
+        this.orderStatusHolder = orderStatusHolder;
     }
 
     @Override
-    public OrderDto addOrder(OrderDto orderDto) {
-        return orderRepository.save(orderDto);
+    public OrderDto addOrder(OrderRequestDto orderDto) {
+        OrderDto order = OrderMapper.mapOrderRequestToOrder(orderDto);
+        order.setOrderStatus(orderStatusHolder.getOrderStatusByCode(1));
+        return orderRepository.save(order);
     }
 
     @Override
-    public OrderDto updateOrder(OrderDto orderDto) {
-        OrderDto existingOrder = orderRepository.findById(orderDto.getId()).orElse(null);
-        if (existingOrder != null) {
-            existingOrder.setBillingAddress(orderDto.getBillingAddress());
-            existingOrder.setShippingAddress(orderDto.getShippingAddress());
-            existingOrder.setKnife(orderDto.getKnife());
-            existingOrder.setTotalAmount(orderDto.getTotalAmount());
-            existingOrder.setOrderStatus(orderDto.getOrderStatus());
-            return orderRepository.save(existingOrder);
+    public OrderDto updateOrder(String id, int orderStatus, String history) {
+        try {
+            OrderDto existingOrder = orderRepository.findById(id).orElse(null);
+            OrderStatusDto orderStatusDto = orderStatusHolder.getOrderStatusByCode(orderStatus);
+            if (existingOrder != null) {
+                existingOrder.setOrderStatus(orderStatusDto);
+                existingOrder.setHistory(history);
+                return orderRepository.save(existingOrder);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error updating order: " + e.getMessage(), e);
         }
         return null;
     }
@@ -65,8 +79,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderDto> getOrdersByStatus(String orderStatus) {
-        return orderRepository.findByOrderStatus(orderStatus);
+    public List<OrderDto> getOrdersByStatus(int orderStatus) {
+        return orderRepository.findByOrderStatusCode(orderStatus);
     }
     @Override
     public Page<OrderDto> searchOrders(String searchTerm, String minPrice, String maxPrice, String startDate, String endDate,
@@ -111,12 +125,19 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderDto updateOrderStatus(String id, String orderStatus) {
+    public OrderDto updateOrderStatus(String id, int orderStatusCode) {
+        OrderStatusDto orderStatus = new OrderStatusDto(0, "");
+        orderStatus.setOrderStatusCode(orderStatusCode);
         OrderDto existingOrder = orderRepository.findById(id).orElse(null);
         if (existingOrder != null) {
             existingOrder.setOrderStatus(orderStatus);
             return orderRepository.save(existingOrder);
         }
         return null;
+    }
+
+    @Override
+    public List<OrderStatusDto> getAllOrderStatus() {
+        return orderStatusHolder.getAllOrderStatusAsDtoList();
     }
 }

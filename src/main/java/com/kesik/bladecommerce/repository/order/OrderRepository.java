@@ -12,7 +12,8 @@ import java.util.List;
 @Repository
 public interface OrderRepository extends MongoRepository<OrderDto, String> {
 
-    List<OrderDto> findByOrderStatus(String orderStatus);
+    @Query("{ 'orderStatus.orderStatusCode': ?0 }")
+    List<OrderDto> findByOrderStatusCode(int orderStatusCode);
 
     @Query("{ $and: [ " +
             "{ $or: [ { 'knife.name': { $regex: ?0, $options: 'i' } }, { 'knife.description': { $regex: ?0, $options: 'i' } } ] }, " +

@@ -1,6 +1,9 @@
 package com.kesik.bladecommerce.service;
 
+import com.kesik.bladecommerce.dto.iyzico.OrderRequestDto;
+import com.kesik.bladecommerce.dto.order.AddOrderDto;
 import com.kesik.bladecommerce.dto.order.OrderDto;
+import com.kesik.bladecommerce.dto.order.OrderStatusDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -9,9 +12,9 @@ import java.util.Optional;
 
 public interface OrderService {
 
-    OrderDto addOrder(OrderDto orderDto);
+    OrderDto addOrder(OrderRequestDto orderDto);
 
-    OrderDto updateOrder(OrderDto orderDto);
+    OrderDto updateOrder(String id, int orderStatus, String history);
 
     void deleteOrder(String id);
 
@@ -19,10 +22,12 @@ public interface OrderService {
 
     Optional<OrderDto> getOrderById(String id);
 
-    List<OrderDto> getOrdersByStatus(String orderStatus);
+    List<OrderDto> getOrdersByStatus(int orderStatus);
 
     Page<OrderDto> searchOrders(String searchTerm, String minPrice, String maxPrice, String startDate, String endDate,
                                 int sortDirection, String status, Pageable pageable);
 
-    OrderDto updateOrderStatus(String id, String orderStatus);
+    OrderDto updateOrderStatus(String id, int orderStatus);
+
+    List<OrderStatusDto> getAllOrderStatus();
 }
