@@ -39,7 +39,6 @@ public class KnifeServiceImpl implements KnifeService {
                                        String knifeType, String bladeMaterial, String sortDirection, int page, int size) {
         Pageable pageable = PageRequest.of(page-1, size, sortDirection.equalsIgnoreCase("asc") ? Sort.by("price").ascending() : Sort.by("price").descending());
 
-        // Criteria ile sorgu oluştur
         List<Criteria> criteriaList = new ArrayList<>();
 
         if (searchTerm != null && !searchTerm.isBlank()) {
@@ -61,13 +60,10 @@ public class KnifeServiceImpl implements KnifeService {
             criteriaList.add(Criteria.where("knifeDetails.bladeMaterial").is(bladeMaterial));
         }
 
-        // Criteria'ları birleştir
         Criteria criteria = new Criteria().andOperator(criteriaList.toArray(new Criteria[0]));
 
-        // Query oluştur
         Query query = new Query(criteria).with(pageable);
 
-        // MongoTemplate ile sorguyu çalıştır
         List<KnifeDto> knives = mongoTemplate.find(query, KnifeDto.class);
 
         return knives;
@@ -130,6 +126,17 @@ public class KnifeServiceImpl implements KnifeService {
         }
         return null;
     }
+
+    @Override
+    public KnifeDto updateKnifeStockQuantity(String id, int quantity) {
+        KnifeDto knife = knifeRepository.findById(id).orElse(null);
+        if (knife != null) {
+            knife.setStockQuantity(quantity);
+            return knifeRepository.save(knife);
+        }
+        return null;
+    }
+
     @Override
     public void deleteKnife(String id) {
         knifeRepository.deleteById(id);

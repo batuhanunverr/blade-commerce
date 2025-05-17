@@ -21,6 +21,8 @@ public interface KnifeService {
 
     KnifeDto updateKnife(UpdateKnifeRequestDto knifeDto);
 
+    KnifeDto updateKnifeStockQuantity(String id, int quantity);
+
     void deleteKnife(String id);
 
     List<String> getKnifeTypes();
