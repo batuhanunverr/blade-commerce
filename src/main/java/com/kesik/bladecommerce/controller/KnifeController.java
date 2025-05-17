@@ -2,7 +2,9 @@ package com.kesik.bladecommerce.controller;
 
 import com.kesik.bladecommerce.dto.knife.AddKnifeRequestDto;
 import com.kesik.bladecommerce.dto.knife.KnifeDto;
+import com.kesik.bladecommerce.dto.knife.UpdateKnifeRequestDto;
 import com.kesik.bladecommerce.service.KnifeService;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -46,7 +48,7 @@ public class KnifeController {
         return knifeService.addKnife(knifeDto);
     }
     @PostMapping(path = "/updateKnife")
-    public KnifeDto updateKnife(@RequestBody KnifeDto knifeDto) {
+    public KnifeDto updateKnife(@RequestBody UpdateKnifeRequestDto knifeDto) {
         return knifeService.updateKnife(knifeDto);
     }
     @DeleteMapping(path = "/deleteKnife")

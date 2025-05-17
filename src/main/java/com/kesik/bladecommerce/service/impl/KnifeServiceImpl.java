@@ -2,6 +2,7 @@ package com.kesik.bladecommerce.service.impl;
 
 import com.kesik.bladecommerce.dto.knife.AddKnifeRequestDto;
 import com.kesik.bladecommerce.dto.knife.KnifeDto;
+import com.kesik.bladecommerce.dto.knife.UpdateKnifeRequestDto;
 import com.kesik.bladecommerce.repository.knife.KnifeRepository;
 import com.kesik.bladecommerce.service.CloudinaryService;
 import com.kesik.bladecommerce.service.KnifeService;
@@ -102,7 +103,7 @@ public class KnifeServiceImpl implements KnifeService {
     }
 
     @Override
-    public KnifeDto updateKnife(KnifeDto knifeDto) {
+    public KnifeDto updateKnife(UpdateKnifeRequestDto knifeDto) {
         KnifeDto existingKnife = knifeRepository.findById(knifeDto.getId()).orElse(null);
         if (existingKnife != null) {
             existingKnife.setName(knifeDto.getName());
@@ -110,6 +111,21 @@ public class KnifeServiceImpl implements KnifeService {
             existingKnife.setPrice(knifeDto.getPrice());
             existingKnife.setCategoryId(knifeDto.getCategoryId());
             existingKnife.setTags(knifeDto.getTags());
+            existingKnife.setDiscountPrice(knifeDto.getDiscountPrice());
+            existingKnife.setStockQuantity(knifeDto.getStockQuantity());
+            existingKnife.setTags(knifeDto.getTags());
+            existingKnife.setKnifeType(knifeDto.getKnifeType());
+            existingKnife.setBladeMaterial(knifeDto.getBladeMaterial());
+            existingKnife.setHandleMaterial(knifeDto.getHandleMaterial());
+            existingKnife.setBladeLength(knifeDto.getBladeLength());
+            existingKnife.setColor(knifeDto.getColor());
+            if (knifeDto.getImageFile() != null && !knifeDto.getImageFile().isEmpty()) {
+                try {
+                    existingKnife.setImageUrl(cloudinaryService.uploadFile(knifeDto.getImageFile()));
+                } catch (IOException e) {
+                    throw new RuntimeException("error uploading image to server " + e);
+                }
+            }
             return knifeRepository.save(existingKnife);
         }
         return null;

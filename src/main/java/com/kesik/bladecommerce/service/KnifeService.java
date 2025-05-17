@@ -2,6 +2,8 @@ package com.kesik.bladecommerce.service;
 
 import com.kesik.bladecommerce.dto.knife.AddKnifeRequestDto;
 import com.kesik.bladecommerce.dto.knife.KnifeDto;
+import com.kesik.bladecommerce.dto.knife.UpdateKnifeRequestDto;
+import org.springframework.data.mongodb.core.query.Update;
 
 import java.util.List;
 
@@ -17,7 +19,7 @@ public interface KnifeService {
 
     KnifeDto addKnife(AddKnifeRequestDto knifeDto);
 
-    KnifeDto updateKnife(KnifeDto knifeDto);
+    KnifeDto updateKnife(UpdateKnifeRequestDto knifeDto);
 
     void deleteKnife(String id);
 
