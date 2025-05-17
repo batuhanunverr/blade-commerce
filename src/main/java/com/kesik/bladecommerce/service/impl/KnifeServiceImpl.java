@@ -37,36 +37,41 @@ public class KnifeServiceImpl implements KnifeService {
     @Override
     public List<KnifeDto> searchKnives(String searchTerm, Integer categoryId, Double minPrice, Double maxPrice,
                                        String knifeType, String bladeMaterial, String sortDirection, int page, int size) {
-        Pageable pageable = PageRequest.of(page-1, size, sortDirection.equalsIgnoreCase("asc") ? Sort.by("price").ascending() : Sort.by("price").descending());
+        try {
+            Pageable pageable = PageRequest.of(page - 1, size,
+                    sortDirection.equalsIgnoreCase("asc") ? Sort.by("price").ascending() : Sort.by("price").descending());
 
-        List<Criteria> criteriaList = new ArrayList<>();
+            List<Criteria> criteriaList = new ArrayList<>();
 
-        if (searchTerm != null && !searchTerm.isBlank()) {
-            criteriaList.add(Criteria.where("name").regex(searchTerm, "i"));
-        }
-        if (categoryId != null) {
-            criteriaList.add(Criteria.where("categoryId").is(categoryId));
-        }
-        if (minPrice != null) {
-            criteriaList.add(Criteria.where("price").gte(minPrice));
-        }
-        if (maxPrice != null) {
-            criteriaList.add(Criteria.where("price").lte(maxPrice));
-        }
-        if (knifeType != null && !knifeType.isBlank()) {
-            criteriaList.add(Criteria.where("knifeDetails.knifeType").is(knifeType));
-        }
-        if (bladeMaterial != null && !bladeMaterial.isBlank()) {
-            criteriaList.add(Criteria.where("knifeDetails.bladeMaterial").is(bladeMaterial));
-        }
+            if (searchTerm != null && !searchTerm.isEmpty()) {
+                criteriaList.add(Criteria.where("name").regex(searchTerm, "i"));
+            }
+            if (categoryId != null) {
+                criteriaList.add(Criteria.where("categoryId").is(categoryId));
+            }
+            if (minPrice != null) {
+                criteriaList.add(Criteria.where("price").gte(minPrice));
+            }
+            if (maxPrice != null) {
+                criteriaList.add(Criteria.where("price").lte(maxPrice));
+            }
+            if (knifeType != null && !knifeType.isEmpty()) {
+                criteriaList.add(Criteria.where("knifeType").is(knifeType));
+            }
+            if (bladeMaterial != null && !bladeMaterial.isEmpty()) {
+                criteriaList.add(Criteria.where("bladeMaterial").is(bladeMaterial));
+            }
 
-        Criteria criteria = new Criteria().andOperator(criteriaList.toArray(new Criteria[0]));
+            Query query = new Query();
+            if (!criteriaList.isEmpty()) {
+                query.addCriteria(new Criteria().andOperator(criteriaList.toArray(new Criteria[0])));
+            }
+            query.with(pageable);
 
-        Query query = new Query(criteria).with(pageable);
-
-        List<KnifeDto> knives = mongoTemplate.find(query, KnifeDto.class);
-
-        return knives;
+            return mongoTemplate.find(query, KnifeDto.class);
+        } catch (Exception e) {
+            throw new RuntimeException("Error searching knives: " + e.getMessage(), e);
+        }
     }
     @Override
     public KnifeDto getKnifeById(String id) {
