@@ -45,7 +45,7 @@ public class OrderController {
         return orderService.getAllOrderStatus();
     }
 
-    @PostMapping(path = "/deleteOrder")
+    @GetMapping(path = "/deleteOrder")
     public void deleteOrder(String id) {
         orderService.deleteOrder(id);
     }

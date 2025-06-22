@@ -44,7 +44,7 @@ public class KnifeController {
         return knifeService.getKnifeByName(name);
     }
     @PostMapping(path = "/addKnife")
-    public KnifeDto addKnife(@ModelAttribute AddKnifeRequestDto knifeDto) {
+    public KnifeDto addKnife(@RequestBody AddKnifeRequestDto knifeDto) {
         return knifeService.addKnife(knifeDto);
     }
     @PostMapping(path = "/updateKnife")

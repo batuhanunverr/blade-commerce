@@ -2,9 +2,7 @@ package com.kesik.bladecommerce.controller;
 
 import com.kesik.bladecommerce.dto.category.CategoryDto;
 import com.kesik.bladecommerce.service.CategoryService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -23,12 +21,12 @@ public class CategoryController {
     public CategoryDto getCategoryById(Integer categoryId) {
         return categoryService.getCategoryById(categoryId);
     }
-    @GetMapping(path = "/addCategory")
-    public CategoryDto addCategory(CategoryDto categoryDto) {
+    @PostMapping(path = "/addCategory")
+    public CategoryDto addCategory(@RequestBody CategoryDto categoryDto) {
         return categoryService.addCategory(categoryDto);
     }
-    @GetMapping(path = "/updateCategory")
-    public CategoryDto updateCategory(CategoryDto categoryDto) {
+    @PostMapping(path = "/updateCategory")
+    public CategoryDto updateCategory(@RequestBody CategoryDto categoryDto) {
         return categoryService.updateCategory(categoryDto);
     }
     @GetMapping(path = "/deleteCategory")
