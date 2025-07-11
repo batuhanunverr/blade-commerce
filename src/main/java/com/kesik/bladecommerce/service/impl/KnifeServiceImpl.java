@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class KnifeServiceImpl implements KnifeService {
@@ -34,55 +35,75 @@ public class KnifeServiceImpl implements KnifeService {
     public List<KnifeDto> getAllKnives() {
         return knifeRepository.findAll();
     }
+
     @Override
     public List<KnifeDto> searchKnives(String searchTerm, Integer categoryId, Double minPrice, Double maxPrice,
                                        String knifeType, String bladeMaterial, String sortDirection, int page, int size) {
         try {
-            Pageable pageable = PageRequest.of(page - 1, size,
-                    sortDirection.equalsIgnoreCase("asc") ? Sort.by("price").ascending() : Sort.by("price").descending());
+            Pageable pageable = PageRequest.of(page - 1, size, getSort(sortDirection));
+            Query query = new Query().with(pageable);
+            List<Criteria> criteriaList = buildSearchCriteria(searchTerm, categoryId, minPrice, maxPrice, knifeType, bladeMaterial);
 
-            List<Criteria> criteriaList = new ArrayList<>();
-
-            if (searchTerm != null && !searchTerm.isEmpty()) {
-                criteriaList.add(Criteria.where("name").regex(searchTerm, "i"));
-            }
-            if (categoryId != null) {
-                criteriaList.add(Criteria.where("categoryId").is(categoryId));
-            }
-            if (minPrice != null) {
-                criteriaList.add(Criteria.where("price").gte(minPrice));
-            }
-            if (maxPrice != null) {
-                criteriaList.add(Criteria.where("price").lte(maxPrice));
-            }
-            if (knifeType != null && !knifeType.isEmpty()) {
-                criteriaList.add(Criteria.where("knifeType").is(knifeType));
-            }
-            if (bladeMaterial != null && !bladeMaterial.isEmpty()) {
-                criteriaList.add(Criteria.where("bladeMaterial").is(bladeMaterial));
-            }
-
-            Query query = new Query();
             if (!criteriaList.isEmpty()) {
                 query.addCriteria(new Criteria().andOperator(criteriaList.toArray(new Criteria[0])));
             }
-            query.with(pageable);
 
             return mongoTemplate.find(query, KnifeDto.class);
         } catch (Exception e) {
             throw new RuntimeException("Error searching knives: " + e.getMessage(), e);
         }
     }
+
+    private Sort getSort(String sortDirection) {
+        return "asc".equalsIgnoreCase(sortDirection) ? Sort.by("price").ascending() : Sort.by("price").descending();
+    }
+
+    private List<Criteria> buildSearchCriteria(String searchTerm, Integer categoryId, Double minPrice, Double maxPrice,
+                                               String knifeType, String bladeMaterial) {
+        List<Criteria> criteriaList = new ArrayList<>();
+        if (searchTerm != null && !searchTerm.isEmpty()) {
+            criteriaList.add(Criteria.where("name").regex(searchTerm, "i"));
+        }
+        if (categoryId != null) {
+            criteriaList.add(Criteria.where("categoryId").is(categoryId));
+        }
+        if (minPrice != null) {
+            criteriaList.add(Criteria.where("price").gte(minPrice));
+        }
+        if (maxPrice != null) {
+            criteriaList.add(Criteria.where("price").lte(maxPrice));
+        }
+        if (knifeType != null && !knifeType.isEmpty()) {
+            criteriaList.add(Criteria.where("knifeType").is(knifeType));
+        }
+        if (bladeMaterial != null && !bladeMaterial.isEmpty()) {
+            criteriaList.add(Criteria.where("bladeMaterial").is(bladeMaterial));
+        }
+        return criteriaList;
+    }
+
     @Override
     public KnifeDto getKnifeById(String id) {
         return knifeRepository.findById(id).orElse(null);
     }
+
     @Override
     public KnifeDto getKnifeByName(String name) {
         return knifeRepository.getKnifeByName(name);
     }
+
     @Override
     public KnifeDto addKnife(AddKnifeRequestDto knifeDto) {
+        KnifeDto newKnife = mapAddKnifeRequestToDto(knifeDto);
+        try {
+            newKnife.setImageUrl(cloudinaryService.uploadFile(knifeDto.getImageFile()));
+        } catch (IOException e) {
+            throw new RuntimeException("error uploading image to server " + e);
+        }
+        return knifeRepository.save(newKnife);
+    }
+
+    private KnifeDto mapAddKnifeRequestToDto(AddKnifeRequestDto knifeDto) {
         KnifeDto newKnife = new KnifeDto();
         newKnife.setName(knifeDto.getName());
         newKnife.setDescription(knifeDto.getDescription());
@@ -95,51 +116,47 @@ public class KnifeServiceImpl implements KnifeService {
         newKnife.setBladeMaterial(knifeDto.getBladeMaterial());
         newKnife.setHandleMaterial(knifeDto.getHandleMaterial());
         newKnife.setBladeLength(knifeDto.getBladeLength());
-        try {
-            newKnife.setImageUrl(cloudinaryService.uploadFile(knifeDto.getImageFile()));
-        } catch (IOException e) {
-            throw new RuntimeException("error uploading image to server " + e);
-        }
-        return knifeRepository.save(newKnife);
+        return newKnife;
     }
 
     @Override
     public KnifeDto updateKnife(UpdateKnifeRequestDto knifeDto) {
         KnifeDto existingKnife = knifeRepository.findById(knifeDto.getId()).orElse(null);
-        if (existingKnife != null) {
-            existingKnife.setName(knifeDto.getName());
-            existingKnife.setDescription(knifeDto.getDescription());
-            existingKnife.setPrice(knifeDto.getPrice());
-            existingKnife.setCategoryId(knifeDto.getCategoryId());
-            existingKnife.setTags(knifeDto.getTags());
-            existingKnife.setDiscountPrice(knifeDto.getDiscountPrice());
-            existingKnife.setStockQuantity(knifeDto.getStockQuantity());
-            existingKnife.setTags(knifeDto.getTags());
-            existingKnife.setKnifeType(knifeDto.getKnifeType());
-            existingKnife.setBladeMaterial(knifeDto.getBladeMaterial());
-            existingKnife.setHandleMaterial(knifeDto.getHandleMaterial());
-            existingKnife.setBladeLength(knifeDto.getBladeLength());
-            existingKnife.setColor(knifeDto.getColor());
-            if (knifeDto.getImageFile() != null && !knifeDto.getImageFile().isEmpty()) {
-                try {
-                    existingKnife.setImageUrl(cloudinaryService.uploadFile(knifeDto.getImageFile()));
-                } catch (IOException e) {
-                    throw new RuntimeException("error uploading image to server " + e);
-                }
+        if (existingKnife == null) return null;
+
+        updateKnifeFields(existingKnife, knifeDto);
+
+        if (knifeDto.getImageFile() != null && !knifeDto.getImageFile().isEmpty()) {
+            try {
+                existingKnife.setImageUrl(cloudinaryService.uploadFile(knifeDto.getImageFile()));
+            } catch (IOException e) {
+                throw new RuntimeException("error uploading image to server " + e);
             }
-            return knifeRepository.save(existingKnife);
         }
-        return null;
+        return knifeRepository.save(existingKnife);
+    }
+
+    private void updateKnifeFields(KnifeDto knife, UpdateKnifeRequestDto dto) {
+        knife.setName(dto.getName());
+        knife.setDescription(dto.getDescription());
+        knife.setPrice(dto.getPrice());
+        knife.setCategoryId(dto.getCategoryId());
+        knife.setTags(dto.getTags());
+        knife.setDiscountPrice(dto.getDiscountPrice());
+        knife.setStockQuantity(dto.getStockQuantity());
+        knife.setKnifeType(dto.getKnifeType());
+        knife.setBladeMaterial(dto.getBladeMaterial());
+        knife.setHandleMaterial(dto.getHandleMaterial());
+        knife.setBladeLength(dto.getBladeLength());
+        knife.setColor(dto.getColor());
     }
 
     @Override
     public KnifeDto updateKnifeStockQuantity(String id, int quantity) {
         KnifeDto knife = knifeRepository.findById(id).orElse(null);
-        if (knife != null) {
-            knife.setStockQuantity(quantity);
-            return knifeRepository.save(knife);
-        }
-        return null;
+        if (knife == null) return null;
+        knife.setStockQuantity(quantity);
+        return knifeRepository.save(knife);
     }
 
     @Override
@@ -149,11 +166,17 @@ public class KnifeServiceImpl implements KnifeService {
 
     @Override
     public List<String> getKnifeTypes() {
-        List<KnifeDto> knives = knifeRepository.findAll();
-        List<String> knifeTypes = new ArrayList<>();
-        for (KnifeDto knife : knives) {
-          knifeTypes.add(knife.getKnifeType());
-        }
-        return knifeTypes.stream().distinct().toList();
+        return knifeRepository.findAll().stream()
+                .map(KnifeDto::getKnifeType)
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
+    }
+
+    @Override
+    public int getKnifeCountByCategory(String categoryId) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("categoryId").is(categoryId));
+        return (int) mongoTemplate.count(query, KnifeDto.class);
     }
 }

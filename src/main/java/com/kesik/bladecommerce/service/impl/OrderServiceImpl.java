@@ -9,6 +9,7 @@ import com.kesik.bladecommerce.dto.order.OrderStatusDto;
 import com.kesik.bladecommerce.mapper.OrderMapper;
 import com.kesik.bladecommerce.repository.order.OrderRepository;
 import com.kesik.bladecommerce.service.KnifeService;
+import com.kesik.bladecommerce.service.MailService;
 import com.kesik.bladecommerce.service.OrderService;
 import com.kesik.bladecommerce.util.OrderStatusHolder;
 import jakarta.annotation.PostConstruct;
@@ -21,23 +22,20 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
 public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final MongoTemplate mongoTemplate;
-    private final KnifeService knifeService;
     private final OrderStatusHolder orderStatusHolder;
+    private final MailService mailService;
 
-    public OrderServiceImpl(OrderRepository orderRepository, MongoTemplate mongoTemplate, KnifeService knifeService, OrderStatusHolder orderStatusHolder) {
+    public OrderServiceImpl(OrderRepository orderRepository, MongoTemplate mongoTemplate, OrderStatusHolder orderStatusHolder, MailService mailService) {
         this.orderRepository = orderRepository;
         this.mongoTemplate = mongoTemplate;
-        this.knifeService = knifeService;
         this.orderStatusHolder = orderStatusHolder;
+        this.mailService = mailService;
     }
 
     @Override
@@ -55,7 +53,20 @@ public class OrderServiceImpl implements OrderService {
             if (existingOrder != null) {
                 existingOrder.setOrderStatus(orderStatusDto);
                 existingOrder.setHistory(history);
-                return orderRepository.save(existingOrder);
+                OrderDto updatedOrder = orderRepository.save(existingOrder);
+
+                if (updatedOrder.getEmail() != null && !updatedOrder.getEmail().isEmpty()) {
+                    try {
+                        mailService.sendOrderStatusUpdate(
+                                updatedOrder.getEmail(),
+                                "Sipariş Durumunuz Güncellendi",
+                                "Siparişinizin yeni durumu: " + orderStatusDto.getOrderStatusText()
+                        );
+                    } catch (Exception mailException) {
+                        System.err.println("Mail gönderilemedi: " + mailException.getMessage());
+                    }
+                }
+                return updatedOrder;
             }
         } catch (Exception e) {
             throw new RuntimeException("Error updating order: " + e.getMessage(), e);

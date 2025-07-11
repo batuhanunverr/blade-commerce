@@ -59,4 +59,7 @@ public class KnifeController {
     public List<String> getKnifeTypes() {
         return knifeService.getKnifeTypes();
     }
+    public int getKnifeCountByCategory(String categoryId) {
+        return knifeService.getKnifeCountByCategory(categoryId);
+    }
 }

@@ -3,7 +3,6 @@ package com.kesik.bladecommerce.service;
 import com.kesik.bladecommerce.dto.knife.AddKnifeRequestDto;
 import com.kesik.bladecommerce.dto.knife.KnifeDto;
 import com.kesik.bladecommerce.dto.knife.UpdateKnifeRequestDto;
-import org.springframework.data.mongodb.core.query.Update;
 
 import java.util.List;
 
@@ -26,4 +25,6 @@ public interface KnifeService {
     void deleteKnife(String id);
 
     List<String> getKnifeTypes();
+
+    int getKnifeCountByCategory(String categoryId);
 }
