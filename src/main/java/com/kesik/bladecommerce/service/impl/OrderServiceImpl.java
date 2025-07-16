@@ -125,7 +125,12 @@ public class OrderServiceImpl implements OrderService {
             criteriaList.add(Criteria.where("orderStatus").is(status));
         }
 
-        Criteria criteria = new Criteria().andOperator(criteriaList.toArray(new Criteria[0]));
+        Criteria criteria;
+        if (criteriaList.isEmpty()) {
+            criteria = new Criteria();
+        } else {
+            criteria = new Criteria().andOperator(criteriaList.toArray(new Criteria[0]));
+        }
         Sort sort = sortDirection == 1 ? Sort.by("totalAmount").ascending() : Sort.by("totalAmount").descending();
         Query query = new Query(criteria).with(pageable).with(sort);
 
