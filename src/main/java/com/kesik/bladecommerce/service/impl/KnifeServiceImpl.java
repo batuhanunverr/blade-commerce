@@ -127,7 +127,7 @@ public class KnifeServiceImpl implements KnifeService {
         newKnife.setBladeMaterial(knifeDto.getBladeMaterial());
         newKnife.setHandleMaterial(knifeDto.getHandleMaterial());
         newKnife.setBladeLength(knifeDto.getBladeLength());
-        newKnife.setKnifeSize(knifeDto.getKnifeSize());
+        newKnife.setKnifeSizes(knifeDto.getKnifeSizes());
         return newKnife;
     }
 
@@ -161,7 +161,7 @@ public class KnifeServiceImpl implements KnifeService {
         knife.setHandleMaterial(dto.getHandleMaterial());
         knife.setBladeLength(dto.getBladeLength());
         knife.setColor(dto.getColor());
-        knife.setKnifeSize(dto.getKnifeSize());
+        knife.setKnifeSizes(dto.getKnifeSizes());
     }
 
     @Override

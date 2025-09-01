@@ -40,6 +40,7 @@ public class OrderMapper {
             List<KnifeDto> orderKnifes = new ArrayList<>();
             for (BasketItemDto knife : orderRequest.getBasketItems()) {
                 KnifeDto knifeDto = knifeService.getKnifeById(knife.getId());
+                knifeDto.setSelectedSize(knife.getSelectedSize());
                 knifeService.updateKnifeStockQuantity(knifeDto.getId(), knifeDto.getStockQuantity() - 1);
                 orderKnifes.add(knifeDto);
             }

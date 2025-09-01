@@ -21,5 +21,5 @@ public class AddKnifeRequestDto {
     private String color;
     private String bladeMaterial;
     private String handleMaterial;
-    private Integer knifeSize;
+    private List<String> knifeSizes;
 }
