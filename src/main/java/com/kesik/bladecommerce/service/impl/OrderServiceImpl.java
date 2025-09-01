@@ -46,11 +46,14 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderDto updateOrder(String id, int orderStatus, String history) {
+    public OrderDto updateOrder(String id, int orderStatus, String history, String adminNote) {
         try {
             OrderDto existingOrder = orderRepository.findById(id).orElse(null);
             OrderStatusDto orderStatusDto = orderStatusHolder.getOrderStatusByCode(orderStatus);
             if (existingOrder != null) {
+                if (adminNote != null && !adminNote.isEmpty()) {
+                    existingOrder.setAdminNote(adminNote);
+                }
                 existingOrder.setOrderStatus(orderStatusDto);
                 existingOrder.setHistory(history);
                 OrderDto updatedOrder = orderRepository.save(existingOrder);

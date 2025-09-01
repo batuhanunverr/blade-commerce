@@ -36,8 +36,8 @@ public class OrderController {
     }
 
     @GetMapping(path = "/updateOrder")
-    public OrderDto updateOrder(String id, int orderStatus, String history) {
-        return orderService.updateOrder(id, orderStatus, history);
+    public OrderDto updateOrder(String id, int orderStatus, String history, String adminNote) {
+        return orderService.updateOrder(id, orderStatus, history, adminNote);
     }
 
     @GetMapping(path = "/getAllOrderStatus")

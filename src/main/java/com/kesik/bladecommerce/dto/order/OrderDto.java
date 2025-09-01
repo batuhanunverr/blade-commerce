@@ -23,4 +23,5 @@ public class OrderDto {
     private String phoneNumber;
     private String paymentId;
     private String selectedKnifeSize;
+    private String adminNote;
 }

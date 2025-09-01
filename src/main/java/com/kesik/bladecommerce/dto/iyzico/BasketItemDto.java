@@ -12,4 +12,5 @@ public class BasketItemDto {
     private String category2;
     private String itemType;
     private String selectedSize;
+    private String note;
 }

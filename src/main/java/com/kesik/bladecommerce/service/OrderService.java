@@ -14,7 +14,7 @@ public interface OrderService {
 
     OrderDto addOrder(OrderRequestDto orderDto);
 
-    OrderDto updateOrder(String id, int orderStatus, String history);
+    OrderDto updateOrder(String id, int orderStatus, String history, String adminNote);
 
     void deleteOrder(String id);
 

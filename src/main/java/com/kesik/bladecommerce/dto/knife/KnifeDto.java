@@ -26,5 +26,6 @@ public class KnifeDto {
     private String handleMaterial;
     private List<String> knifeSizes;
     private String selectedSize;
+    private String customerNote;
 }
 
