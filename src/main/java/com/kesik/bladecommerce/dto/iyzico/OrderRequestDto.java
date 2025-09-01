@@ -19,4 +19,5 @@ public class OrderRequestDto {
     private String callbackUrl;
     private String currency;
     private String paidPrice;
+    private String paymentId;
 }

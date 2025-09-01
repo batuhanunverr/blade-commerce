@@ -20,4 +20,5 @@ public class OrderDto {
     private String userSurname;
     private String email;
     private String phoneNumber;
+    private String paymentId;
 }

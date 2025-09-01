@@ -29,4 +29,8 @@ public class CloudinaryServiceImpl implements CloudinaryService {
         Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
         return uploadResult.get("secure_url").toString();
     }
+    public String uploadBase64(String base64Image) throws IOException {
+        Map uploadResult = cloudinary.uploader().upload(base64Image, ObjectUtils.emptyMap());
+        return uploadResult.get("secure_url").toString();
+    }
 }

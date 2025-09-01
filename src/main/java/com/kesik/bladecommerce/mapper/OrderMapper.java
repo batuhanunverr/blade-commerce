@@ -36,6 +36,7 @@ public class OrderMapper {
             orderDto.setEmail(orderRequest.getBuyer().getEmail());
             orderDto.setPhoneNumber(orderRequest.getBuyer().getGsmNumber());
             orderDto.setHistory("Sipariş oluşturuldu.");
+            orderDto.setPaymentId(orderRequest.getPaymentId());
             List<KnifeDto> orderKnifes = new ArrayList<>();
             for (BasketItemDto knife : orderRequest.getBasketItems()) {
                 KnifeDto knifeDto = knifeService.getKnifeById(knife.getId());

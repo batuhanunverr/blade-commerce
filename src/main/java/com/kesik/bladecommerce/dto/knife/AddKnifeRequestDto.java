@@ -8,6 +8,7 @@ import java.util.List;
 @Data
 public class AddKnifeRequestDto {
     private MultipartFile imageFile; // For file upload
+    private String imageBase64;
     private String name;
     private Integer categoryId;
     private String description;
@@ -20,4 +21,5 @@ public class AddKnifeRequestDto {
     private String color;
     private String bladeMaterial;
     private String handleMaterial;
+    private Integer knifeSize;
 }

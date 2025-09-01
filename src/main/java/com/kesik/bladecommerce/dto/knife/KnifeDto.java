@@ -24,5 +24,6 @@ public class KnifeDto {
     private String color;
     private String bladeMaterial;
     private String handleMaterial;
+    private Integer knifeSize;
 }
 

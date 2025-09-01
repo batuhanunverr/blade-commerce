@@ -95,13 +95,24 @@ public class KnifeServiceImpl implements KnifeService {
     @Override
     public KnifeDto addKnife(AddKnifeRequestDto knifeDto) {
         KnifeDto newKnife = mapAddKnifeRequestToDto(knifeDto);
+
         try {
-            newKnife.setImageUrl(cloudinaryService.uploadFile(knifeDto.getImageFile()));
+            String imageUrl = null;
+
+            if (knifeDto.getImageFile() != null && !knifeDto.getImageFile().isEmpty()) {
+                imageUrl = cloudinaryService.uploadFile(knifeDto.getImageFile());
+            } else if (knifeDto.getImageBase64() != null && !knifeDto.getImageBase64().isEmpty()) {
+                imageUrl = cloudinaryService.uploadBase64(knifeDto.getImageBase64());
+            }
+
+            newKnife.setImageUrl(imageUrl);
         } catch (IOException e) {
-            throw new RuntimeException("error uploading image to server " + e);
+            throw new RuntimeException("Error uploading image to server", e);
         }
+
         return knifeRepository.save(newKnife);
     }
+
 
     private KnifeDto mapAddKnifeRequestToDto(AddKnifeRequestDto knifeDto) {
         KnifeDto newKnife = new KnifeDto();
@@ -116,6 +127,7 @@ public class KnifeServiceImpl implements KnifeService {
         newKnife.setBladeMaterial(knifeDto.getBladeMaterial());
         newKnife.setHandleMaterial(knifeDto.getHandleMaterial());
         newKnife.setBladeLength(knifeDto.getBladeLength());
+        newKnife.setKnifeSize(knifeDto.getKnifeSize());
         return newKnife;
     }
 
@@ -149,6 +161,7 @@ public class KnifeServiceImpl implements KnifeService {
         knife.setHandleMaterial(dto.getHandleMaterial());
         knife.setBladeLength(dto.getBladeLength());
         knife.setColor(dto.getColor());
+        knife.setKnifeSize(dto.getKnifeSize());
     }
 
     @Override
