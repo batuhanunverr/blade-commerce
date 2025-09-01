@@ -5,6 +5,7 @@ import lombok.Data;
 @Data
 public class BasketItemDto {
     private String id;
+    private Integer quantity;
     private String price;
     private String name;
     private String category1;

@@ -10,6 +10,7 @@ import java.util.List;
 public class OrderDto {
     private String id;
     private String orderDate;
+    private String conversationId;
     private OrderStatusDto orderStatus;
     private String shippingAddress;
     private String billingAddress;

@@ -35,13 +35,14 @@ public class OrderMapper {
             orderDto.setUserSurname(orderRequest.getBuyer().getSurname());
             orderDto.setEmail(orderRequest.getBuyer().getEmail());
             orderDto.setPhoneNumber(orderRequest.getBuyer().getGsmNumber());
-            orderDto.setHistory("Sipariş oluşturuldu.");
+            orderDto.setConversationId(orderRequest.getConversationId());
             orderDto.setPaymentId(orderRequest.getPaymentId());
+            orderDto.setHistory("Sipariş oluşturuldu.");
             List<KnifeDto> orderKnifes = new ArrayList<>();
             for (BasketItemDto knife : orderRequest.getBasketItems()) {
                 KnifeDto knifeDto = knifeService.getKnifeById(knife.getId());
                 knifeDto.setSelectedSize(knife.getSelectedSize());
-                knifeService.updateKnifeStockQuantity(knifeDto.getId(), knifeDto.getStockQuantity() - 1);
+                knifeService.updateKnifeStockQuantity(knifeDto.getId(), knifeDto.getStockQuantity() - knife.getQuantity());
                 orderKnifes.add(knifeDto);
             }
             orderDto.setKnife(orderKnifes);
