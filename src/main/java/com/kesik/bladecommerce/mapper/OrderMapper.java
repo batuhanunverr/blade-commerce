@@ -59,12 +59,16 @@ public class OrderMapper {
                 if (knife.getQuantity() > knifeDto.getStockQuantity()) {
                     throw new IllegalArgumentException("Insufficient stock for knife: " + knifeDto.getName());
                 }
-                if (knife.getSelectedSize() != null && !knifeDto.getKnifeSizes().contains(knife.getSelectedSize())) {
-                    throw new IllegalArgumentException("Invalid knife size selected for knife: " + knifeDto.getName());
+                if(knifeDto.getKnifeSizes() != null){
+                    if (knife.getSelectedSize() != null && !knifeDto.getKnifeSizes().contains(knife.getSelectedSize())) {
+                        throw new IllegalArgumentException("Invalid knife size selected for knife: " + knifeDto.getName());
+                    }
                 }
-                KnifeOrderDto knifeOrderDto = generateKnifeOrder(knifeDto, knife);
-                knifeService.updateKnifeStockQuantity(knifeDto.getId(), knifeDto.getStockQuantity() - knife.getQuantity());
 
+                KnifeOrderDto knifeOrderDto = generateKnifeOrder(knifeDto, knife);
+                int quantity = knifeDto.getStockQuantity() - knife.getQuantity();
+                knifeService.updateKnifeStockQuantity(knifeDto.getId(), quantity);
+                knifeOrderDto.setStockQuantity(quantity);
                 orderKnifes.add(knifeOrderDto);
             }
             orderDto.setKnife(orderKnifes);
