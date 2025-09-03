@@ -13,6 +13,7 @@ public class KnifeDto {
     private String id;
     private String name;
     private Integer categoryId;
+    private String categoryName;
     private String description;
     private double price;
     private double discountPrice;

@@ -4,6 +4,7 @@ import com.kesik.bladecommerce.dto.knife.AddKnifeRequestDto;
 import com.kesik.bladecommerce.dto.knife.KnifeDto;
 import com.kesik.bladecommerce.dto.knife.UpdateKnifeRequestDto;
 import com.kesik.bladecommerce.repository.knife.KnifeRepository;
+import com.kesik.bladecommerce.service.CategoryService;
 import com.kesik.bladecommerce.service.CloudinaryService;
 import com.kesik.bladecommerce.service.KnifeService;
 import org.springframework.data.domain.PageRequest;
@@ -24,11 +25,13 @@ public class KnifeServiceImpl implements KnifeService {
     private final KnifeRepository knifeRepository;
     private final MongoTemplate mongoTemplate;
     private final CloudinaryService cloudinaryService;
+    private final CategoryService categoryService;
 
-    public KnifeServiceImpl(KnifeRepository knifeRepository, MongoTemplate mongoTemplate, CloudinaryService cloudinaryService) {
+    public KnifeServiceImpl(KnifeRepository knifeRepository, MongoTemplate mongoTemplate, CloudinaryService cloudinaryService, CategoryService categoryService) {
         this.knifeRepository = knifeRepository;
         this.mongoTemplate = mongoTemplate;
         this.cloudinaryService = cloudinaryService;
+        this.categoryService = categoryService;
     }
 
     @Override
@@ -128,6 +131,8 @@ public class KnifeServiceImpl implements KnifeService {
         newKnife.setHandleMaterial(knifeDto.getHandleMaterial());
         newKnife.setBladeLength(knifeDto.getBladeLength());
         newKnife.setKnifeSizes(knifeDto.getKnifeSizes());
+        newKnife.setCategoryName(categoryService.getCategoryById(knifeDto.getCategoryId()) != null ?
+                categoryService.getCategoryById(knifeDto.getCategoryId()).getCategoryName() : null);
         return newKnife;
     }
 
@@ -162,6 +167,8 @@ public class KnifeServiceImpl implements KnifeService {
         knife.setBladeLength(dto.getBladeLength());
         knife.setColor(dto.getColor());
         knife.setKnifeSizes(dto.getKnifeSizes());
+        knife.setCategoryName(categoryService.getCategoryById(dto.getCategoryId()) != null ?
+                categoryService.getCategoryById(dto.getCategoryId()).getCategoryName() : null);
     }
 
     @Override

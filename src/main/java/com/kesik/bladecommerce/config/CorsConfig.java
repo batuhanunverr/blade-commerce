@@ -13,11 +13,7 @@ public class CorsConfig {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**")
-                        .allowedOrigins("*")
-                        .allowedMethods("*")
-                        .allowedHeaders("*")
-                        .allowCredentials(false);
+                registry.addMapping("/**").allowedOrigins("https://knife-shop-eight.vercel.app").allowedMethods("*");
             }
         };
     }

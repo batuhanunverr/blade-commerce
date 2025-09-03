@@ -4,7 +4,6 @@ import com.kesik.bladecommerce.dto.knife.AddKnifeRequestDto;
 import com.kesik.bladecommerce.dto.knife.KnifeDto;
 import com.kesik.bladecommerce.dto.knife.UpdateKnifeRequestDto;
 import com.kesik.bladecommerce.service.KnifeService;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
