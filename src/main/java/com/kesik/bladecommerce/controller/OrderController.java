@@ -12,13 +12,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
+import lombok.extern.slf4j.Slf4j;
 import java.util.List;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/orders")
+@Slf4j
 public class OrderController {
     private final OrderService orderService;
 
@@ -29,6 +29,7 @@ public class OrderController {
     @PostMapping(path = "/addOrder")
     public OrderDto addOrder(@RequestBody OrderRequestDto orderDto) {
         try {
+            log.info("Received OrderRequest: {}", orderDto.getConversationId());
             return orderService.addOrder(orderDto);
         }catch (Exception e){
             throw new RuntimeException("Error mapping OrderRequest to Order: " + e.getMessage(), e);
@@ -37,6 +38,7 @@ public class OrderController {
 
     @GetMapping(path = "/updateOrder")
     public OrderDto updateOrder(String id, int orderStatus, String history, String adminNote) {
+        log.info("Received UpdateOrderRequest: {}", id);
         return orderService.updateOrder(id, orderStatus, history, adminNote);
     }
 

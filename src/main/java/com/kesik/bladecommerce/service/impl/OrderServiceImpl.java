@@ -13,6 +13,7 @@ import com.kesik.bladecommerce.service.MailService;
 import com.kesik.bladecommerce.service.OrderService;
 import com.kesik.bladecommerce.util.OrderStatusHolder;
 import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
+@Slf4j
 public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final MongoTemplate mongoTemplate;
@@ -72,6 +74,7 @@ public class OrderServiceImpl implements OrderService {
                 return updatedOrder;
             }
         } catch (Exception e) {
+            log.info("Error updating order: {}", e.getMessage());
             throw new RuntimeException("Error updating order: " + e.getMessage(), e);
         }
         return null;

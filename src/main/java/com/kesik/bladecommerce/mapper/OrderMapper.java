@@ -6,6 +6,7 @@ import com.kesik.bladecommerce.dto.knife.KnifeDto;
 import com.kesik.bladecommerce.dto.order.KnifeOrderDto;
 import com.kesik.bladecommerce.dto.order.OrderDto;
 import com.kesik.bladecommerce.service.KnifeService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +15,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Component
 public class OrderMapper {
     private static KnifeService knifeService = null;
@@ -28,6 +30,7 @@ public class OrderMapper {
         try {
             OrderDto orderDto = new OrderDto();
             if (orderRequest.getBuyer() == null) {
+                log.warn("Buyer information is missing in the order request: {}", orderRequest.getConversationId());
                 throw new IllegalArgumentException("Buyer information is required.");
             }
             orderDto.setOrderDate(LocalDate.now().toString());
@@ -41,6 +44,7 @@ public class OrderMapper {
             try {
                 orderDto.setTotalAmount(Double.parseDouble(orderRequest.getPrice()));
             } catch (NumberFormatException e) {
+                log.info("Invalid price format: {}", orderRequest.getPrice());
                 throw new IllegalArgumentException("Invalid price format: " + orderRequest.getPrice(), e);
             }
             orderDto.setUserName(orderRequest.getBuyer().getName());
@@ -54,13 +58,18 @@ public class OrderMapper {
             for (BasketItemDto knife : orderRequest.getBasketItems()) {
                 KnifeDto knifeDto = knifeService.getKnifeById(knife.getId());
                 if (knifeDto == null) {
+                    log.info("Knife not found with id: {}", knife.getId());
                     throw new IllegalArgumentException("Knife not found with id: " + knife.getId());
                 }
                 if (knife.getQuantity() > knifeDto.getStockQuantity()) {
+                    log.info("Insufficient stock for knife: {}. Requested: {}, Available: {}",
+                            knifeDto.getName(), knife.getQuantity(), knifeDto.getStockQuantity());
                     throw new IllegalArgumentException("Insufficient stock for knife: " + knifeDto.getName());
                 }
                 if(knifeDto.getKnifeSizes() != null){
                     if (knife.getSelectedSize() != null && !knifeDto.getKnifeSizes().contains(knife.getSelectedSize())) {
+                        log.info("Invalid knife size selected for knife: {}. Selected size: {}, Available sizes: {}",
+                                knifeDto.getName(), knife.getSelectedSize(), knifeDto.getKnifeSizes());
                         throw new IllegalArgumentException("Invalid knife size selected for knife: " + knifeDto.getName());
                     }
                 }
@@ -68,12 +77,14 @@ public class OrderMapper {
                 KnifeOrderDto knifeOrderDto = generateKnifeOrder(knifeDto, knife);
                 int quantity = knifeDto.getStockQuantity() - knife.getQuantity();
                 knifeService.updateKnifeStockQuantity(knifeDto.getId(), quantity);
+                log.info("Updated stock for knife: {}. New stock quantity: {}", knifeDto.getName(), quantity);
                 knifeOrderDto.setStockQuantity(quantity);
                 orderKnifes.add(knifeOrderDto);
             }
             orderDto.setKnife(orderKnifes);
             return orderDto;
         } catch (Exception e) {
+            log.error("Error mapping OrderRequest to Order: {}", e.getMessage(), e);
             throw new RuntimeException("Error mapping OrderRequest to Order: " + e.getMessage(), e);
         }
     }
