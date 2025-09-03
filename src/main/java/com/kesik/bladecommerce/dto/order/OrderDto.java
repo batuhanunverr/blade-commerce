@@ -1,6 +1,6 @@
 package com.kesik.bladecommerce.dto.order;
 
-import com.kesik.bladecommerce.dto.knife.KnifeDto;
+import com.kesik.bladecommerce.dto.iyzico.BasketItemDto;
 import lombok.Data;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -15,7 +15,7 @@ public class OrderDto {
     private String shippingAddress;
     private String billingAddress;
     private Double totalAmount;
-    private List<KnifeDto> knife;
+    private List<KnifeOrderDto> knife;
     private String history;
     private String userName;
     private String userSurname;
