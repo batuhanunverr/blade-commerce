@@ -10,9 +10,15 @@ public class KnifeOrderDto {
     private String name;
     private Integer categoryId;
     private String description;
+    private double price;
+    private double discountPrice;
     private int stockQuantity;
     private String imageUrl;
     private String knifeType;
     private String selectedSize;
     private String customerNote;
+    private double bladeLength;
+    private String bladeMaterial;
+    private String handleMaterial;
+    private String color;
 }

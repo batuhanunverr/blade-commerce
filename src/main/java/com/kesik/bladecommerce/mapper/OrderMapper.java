@@ -95,7 +95,14 @@ public class OrderMapper {
         knifeOrderDto.setName(knifeDto.getName());
         knifeOrderDto.setCategoryId(knifeDto.getCategoryId());
         knifeOrderDto.setDescription(knifeDto.getDescription());
+        knifeOrderDto.setPrice(knifeDto.getPrice());
+        knifeOrderDto.setDiscountPrice(knifeDto.getDiscountPrice());
         knifeOrderDto.setImageUrl(knifeDto.getImageUrl());
+        knifeOrderDto.setKnifeType(knifeDto.getKnifeType());
+        knifeOrderDto.setBladeLength(knifeDto.getBladeLength());
+        knifeOrderDto.setBladeMaterial(knifeDto.getBladeMaterial());
+        knifeOrderDto.setHandleMaterial(knifeDto.getHandleMaterial());
+        knifeOrderDto.setColor(knifeDto.getColor());
         knifeOrderDto.setSelectedSize(knife.getSelectedSize());
         knifeOrderDto.setCustomerNote(knife.getNote());
         return knifeOrderDto;
