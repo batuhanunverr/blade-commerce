@@ -59,8 +59,7 @@ public class KnifeController {
     // Update existing knife
     @PutMapping("/{id}")
     public KnifeDto updateKnife(@PathVariable String id, @Valid @RequestBody UpdateKnifeRequestDto knifeDto) {
-        knifeDto.setId(id); // Ensure ID matches path
-        return knifeService.updateKnife(knifeDto);
+        return knifeService.updateKnife(id, knifeDto);
     }
 
     // Delete knife

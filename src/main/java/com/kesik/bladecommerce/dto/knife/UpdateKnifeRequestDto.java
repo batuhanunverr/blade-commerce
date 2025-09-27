@@ -8,9 +8,6 @@ import java.util.List;
 
 @Data
 public class UpdateKnifeRequestDto {
-    @NotBlank(message = "Product ID is required")
-    private String id;
-
     private MultipartFile imageFile; // For file upload
     private String imageBase64; // For base64 upload
 

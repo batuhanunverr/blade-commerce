@@ -138,8 +138,8 @@ public class KnifeServiceImpl implements KnifeService {
     }
 
     @Override
-    public KnifeDto updateKnife(UpdateKnifeRequestDto knifeDto) {
-        KnifeDto existingKnife = knifeRepository.findById(knifeDto.getId()).orElse(null);
+    public KnifeDto updateKnife(String id, UpdateKnifeRequestDto knifeDto) {
+        KnifeDto existingKnife = knifeRepository.findById(id).orElse(null);
         if (existingKnife == null) return null;
 
         updateKnifeFields(existingKnife, knifeDto);

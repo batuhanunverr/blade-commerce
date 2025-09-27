@@ -17,8 +17,8 @@ public interface KnifeRepository extends MongoRepository<KnifeDto, String> {
             "{ $or: [ { ?1: null }, { 'categoryId': ?1 } ] }, " +
             "{ $or: [ { ?2: null }, { 'price': { $gte: ?2 } } ] }, " +
             "{ $or: [ { ?3: null }, { 'price': { $lte: ?3 } } ] }, " +
-            "{ $or: [ { ?4: null }, { 'knifeDetails.knifeType': ?4 } ] }, " +
-            "{ $or: [ { ?5: null }, { 'knifeDetails.bladeMaterial': ?5 } ] } " +
+            "{ $or: [ { ?4: null }, { 'knifeType': ?4 } ] }, " +
+            "{ $or: [ { ?5: null }, { 'bladeMaterial': ?5 } ] } " +
             "] }")
     Page<KnifeDto> searchKnives(String searchTerm, Integer categoryId, Double minPrice, Double maxPrice,
                                 String knifeType, String bladeMaterial, Pageable pageable);

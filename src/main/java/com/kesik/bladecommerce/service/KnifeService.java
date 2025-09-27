@@ -18,7 +18,7 @@ public interface KnifeService {
 
     KnifeDto addKnife(AddKnifeRequestDto knifeDto);
 
-    KnifeDto updateKnife(UpdateKnifeRequestDto knifeDto);
+    KnifeDto updateKnife(String id, UpdateKnifeRequestDto knifeDto);
 
     KnifeDto updateKnifeStockQuantity(String id, int quantity);
 
