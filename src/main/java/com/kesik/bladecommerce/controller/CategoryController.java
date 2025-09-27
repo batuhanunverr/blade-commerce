@@ -2,9 +2,12 @@ package com.kesik.bladecommerce.controller;
 
 import com.kesik.bladecommerce.dto.category.CategoryDto;
 import com.kesik.bladecommerce.service.CategoryService;
+import com.kesik.bladecommerce.service.KnifeService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/categories")

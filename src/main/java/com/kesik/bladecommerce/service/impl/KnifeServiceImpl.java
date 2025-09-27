@@ -194,7 +194,7 @@ public class KnifeServiceImpl implements KnifeService {
     @Override
     public int getKnifeCountByCategory(String categoryId) {
         Query query = new Query();
-        query.addCriteria(Criteria.where("categoryId").is(categoryId));
+        query.addCriteria(Criteria.where("categoryId").is(Integer.parseInt(categoryId)));
         return (int) mongoTemplate.count(query, KnifeDto.class);
     }
 
