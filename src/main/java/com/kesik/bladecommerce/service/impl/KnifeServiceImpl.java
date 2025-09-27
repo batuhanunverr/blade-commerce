@@ -129,7 +129,7 @@ public class KnifeServiceImpl implements KnifeService {
         newKnife.setTags(knifeDto.getTags());
         newKnife.setStockQuantity(knifeDto.getStockQuantity());
         newKnife.setDiscountPrice(knifeDto.getDiscountPrice());
-        newKnife.setIsPercentageDiscount(knifeDto.isPercentageDiscount());
+        newKnife.setPercentageDiscount(knifeDto.isPercentageDiscount());
         newKnife.setKnifeType(knifeDto.getKnifeType());
         newKnife.setBladeMaterial(knifeDto.getBladeMaterial());
         newKnife.setHandleMaterial(knifeDto.getHandleMaterial());
@@ -177,7 +177,7 @@ public class KnifeServiceImpl implements KnifeService {
         knife.setCategoryId(dto.getCategoryId());
         knife.setTags(dto.getTags());
         knife.setDiscountPrice(dto.getDiscountPrice());
-        knife.setIsPercentageDiscount(dto.isPercentageDiscount());
+        knife.setPercentageDiscount(dto.isPercentageDiscount());
         knife.setStockQuantity(dto.getStockQuantity());
         knife.setKnifeType(dto.getKnifeType());
         knife.setBladeMaterial(dto.getBladeMaterial());

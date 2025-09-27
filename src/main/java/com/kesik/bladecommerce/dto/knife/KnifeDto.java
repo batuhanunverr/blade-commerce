@@ -17,7 +17,7 @@ public class KnifeDto {
     private String description;
     private double price;
     private double discountPrice;
-    private boolean isPercentageDiscount;
+    private boolean percentageDiscount;
     private int stockQuantity;
     private List<String> tags;
     private String imageUrl;

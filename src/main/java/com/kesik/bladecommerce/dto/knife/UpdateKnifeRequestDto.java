@@ -29,7 +29,7 @@ public class UpdateKnifeRequestDto {
     @PositiveOrZero(message = "Discount price must be positive or zero")
     private double discountPrice;
 
-    private boolean isPercentageDiscount;
+    private boolean percentageDiscount;
 
     @PositiveOrZero(message = "Stock quantity cannot be negative")
     private int stockQuantity;
