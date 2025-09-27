@@ -26,7 +26,7 @@ public class OrderController {
         this.orderService = orderService;
     }
 
-    @PostMapping(path = "/addOrder")
+    @PostMapping
     public OrderDto addOrder(@RequestBody OrderRequestDto orderDto) {
         try {
             log.info("Received OrderRequest: {}", orderDto.getConversationId());
@@ -36,10 +36,10 @@ public class OrderController {
         }
     }
 
-    @GetMapping(path = "/updateOrder")
-    public OrderDto updateOrder(String id, int orderStatus, String history, String adminNote) {
+    @PutMapping("/{id}")
+    public OrderDto updateOrder(@PathVariable String id, @RequestParam int orderStatusCode, @RequestParam(required = false) String history, @RequestParam(required = false) String adminNote) {
         log.info("Received UpdateOrderRequest: {}", id);
-        return orderService.updateOrder(id, orderStatus, history, adminNote);
+        return orderService.updateOrder(id, orderStatusCode, history, adminNote);
     }
 
     @GetMapping(path = "/getAllOrderStatus")
@@ -57,8 +57,8 @@ public class OrderController {
         return orderService.getAllOrders();
     }
 
-    @GetMapping(path = "/getOrderById")
-    public Optional<OrderDto> getOrderById(String id) {
+    @GetMapping("/{id}")
+    public Optional<OrderDto> getOrderById(@PathVariable String id) {
         return orderService.getOrderById(id);
     }
 
