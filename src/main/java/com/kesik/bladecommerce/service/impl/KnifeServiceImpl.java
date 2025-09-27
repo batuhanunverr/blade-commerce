@@ -130,6 +130,7 @@ public class KnifeServiceImpl implements KnifeService {
         newKnife.setBladeMaterial(knifeDto.getBladeMaterial());
         newKnife.setHandleMaterial(knifeDto.getHandleMaterial());
         newKnife.setBladeLength(knifeDto.getBladeLength());
+        newKnife.setColor(knifeDto.getColor());
         newKnife.setKnifeSizes(knifeDto.getKnifeSizes());
         newKnife.setCategoryName(categoryService.getCategoryById(knifeDto.getCategoryId()) != null ?
                 categoryService.getCategoryById(knifeDto.getCategoryId()).getCategoryName() : null);
@@ -143,13 +144,22 @@ public class KnifeServiceImpl implements KnifeService {
 
         updateKnifeFields(existingKnife, knifeDto);
 
-        if (knifeDto.getImageFile() != null && !knifeDto.getImageFile().isEmpty()) {
-            try {
-                existingKnife.setImageUrl(cloudinaryService.uploadFile(knifeDto.getImageFile()));
-            } catch (IOException e) {
-                throw new RuntimeException("error uploading image to server " + e);
+        try {
+            String imageUrl = null;
+
+            if (knifeDto.getImageFile() != null && !knifeDto.getImageFile().isEmpty()) {
+                imageUrl = cloudinaryService.uploadFile(knifeDto.getImageFile());
+            } else if (knifeDto.getImageBase64() != null && !knifeDto.getImageBase64().isEmpty()) {
+                imageUrl = cloudinaryService.uploadBase64(knifeDto.getImageBase64());
             }
+
+            if (imageUrl != null) {
+                existingKnife.setImageUrl(imageUrl);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Error uploading image to server", e);
         }
+
         return knifeRepository.save(existingKnife);
     }
 
