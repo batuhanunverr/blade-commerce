@@ -97,6 +97,9 @@ public class KnifeServiceImpl implements KnifeService {
 
     @Override
     public KnifeDto addKnife(AddKnifeRequestDto knifeDto) {
+        // Validate and normalize pricing
+        validateAndNormalizePricing(knifeDto);
+
         KnifeDto newKnife = mapAddKnifeRequestToDto(knifeDto);
 
         try {
@@ -141,6 +144,9 @@ public class KnifeServiceImpl implements KnifeService {
     public KnifeDto updateKnife(String id, UpdateKnifeRequestDto knifeDto) {
         KnifeDto existingKnife = knifeRepository.findById(id).orElse(null);
         if (existingKnife == null) return null;
+
+        // Validate and normalize pricing
+        validateAndNormalizePricing(knifeDto);
 
         updateKnifeFields(existingKnife, knifeDto);
 
@@ -208,5 +214,42 @@ public class KnifeServiceImpl implements KnifeService {
         Query query = new Query();
         query.addCriteria(Criteria.where("categoryId").is(categoryId));
         return (int) mongoTemplate.count(query, KnifeDto.class);
+    }
+
+    /**
+     * Validates and normalizes pricing to ensure data integrity
+     * - If discountPrice >= price: Set discountPrice = price (no discount)
+     * - If discountPrice < 0: Throw validation error
+     * - If price <= 0: Throw validation error
+     */
+    private void validateAndNormalizePricing(Object dto) {
+        double price;
+        double discountPrice;
+
+        // Extract price values using reflection to work with both AddKnifeRequestDto and UpdateKnifeRequestDto
+        try {
+            price = (Double) dto.getClass().getMethod("getPrice").invoke(dto);
+            discountPrice = (Double) dto.getClass().getMethod("getDiscountPrice").invoke(dto);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Invalid DTO structure for price validation");
+        }
+
+        // Validate price constraints
+        if (price <= 0) {
+            throw new IllegalArgumentException("Regular price must be greater than 0");
+        }
+
+        if (discountPrice < 0) {
+            throw new IllegalArgumentException("Discount price cannot be negative");
+        }
+
+        // Normalize: if discount price >= regular price, set them equal (no discount)
+        if (discountPrice >= price) {
+            try {
+                dto.getClass().getMethod("setDiscountPrice", double.class).invoke(dto, price);
+            } catch (Exception e) {
+                throw new IllegalArgumentException("Failed to normalize discount price");
+            }
+        }
     }
 }
