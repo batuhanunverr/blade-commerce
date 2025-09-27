@@ -102,19 +102,9 @@ public class KnifeServiceImpl implements KnifeService {
 
         KnifeDto newKnife = mapAddKnifeRequestToDto(knifeDto);
 
-        try {
-            String imageUrl = null;
-
-            if (knifeDto.getImageFile() != null && !knifeDto.getImageFile().isEmpty()) {
-                imageUrl = cloudinaryService.uploadFile(knifeDto.getImageFile());
-            } else if (knifeDto.getImageBase64() != null && !knifeDto.getImageBase64().isEmpty()) {
-                imageUrl = cloudinaryService.uploadBase64(knifeDto.getImageBase64());
-            }
-
-            newKnife.setImageUrl(imageUrl);
-        } catch (IOException e) {
-            throw new RuntimeException("Error uploading image to server", e);
-        }
+        // Handle image upload
+        String imageUrl = handleImageUpload(knifeDto.getImageFile(), knifeDto.getImageBase64());
+        newKnife.setImageUrl(imageUrl);
 
         return knifeRepository.save(newKnife);
     }
@@ -151,20 +141,10 @@ public class KnifeServiceImpl implements KnifeService {
 
         updateKnifeFields(existingKnife, knifeDto);
 
-        try {
-            String imageUrl = null;
-
-            if (knifeDto.getImageFile() != null && !knifeDto.getImageFile().isEmpty()) {
-                imageUrl = cloudinaryService.uploadFile(knifeDto.getImageFile());
-            } else if (knifeDto.getImageBase64() != null && !knifeDto.getImageBase64().isEmpty()) {
-                imageUrl = cloudinaryService.uploadBase64(knifeDto.getImageBase64());
-            }
-
-            if (imageUrl != null) {
-                existingKnife.setImageUrl(imageUrl);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException("Error uploading image to server", e);
+        // Handle image upload
+        String imageUrl = handleImageUpload(knifeDto.getImageFile(), knifeDto.getImageBase64());
+        if (imageUrl != null) {
+            existingKnife.setImageUrl(imageUrl);
         }
 
         return knifeRepository.save(existingKnife);
@@ -216,6 +196,28 @@ public class KnifeServiceImpl implements KnifeService {
         Query query = new Query();
         query.addCriteria(Criteria.where("categoryId").is(categoryId));
         return (int) mongoTemplate.count(query, KnifeDto.class);
+    }
+
+    /**
+     * Handles image upload for both file and base64 formats
+     * @param imageFile MultipartFile from form upload
+     * @param imageBase64 Base64 encoded image string
+     * @return Uploaded image URL, or null if no image provided
+     */
+    private String handleImageUpload(org.springframework.web.multipart.MultipartFile imageFile, String imageBase64) {
+        try {
+            String imageUrl = null;
+
+            if (imageFile != null && !imageFile.isEmpty()) {
+                imageUrl = cloudinaryService.uploadFile(imageFile);
+            } else if (imageBase64 != null && !imageBase64.isEmpty()) {
+                imageUrl = cloudinaryService.uploadBase64(imageBase64);
+            }
+
+            return imageUrl;
+        } catch (IOException e) {
+            throw new RuntimeException("Error uploading image to server", e);
+        }
     }
 
     /**

@@ -33,7 +33,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryDto updateCategory(CategoryDto categoryDto) {
-        CategoryDto existingCategory = categoryRepository.findById(String.valueOf(categoryDto.getCategoryId())).orElse(null);
+        CategoryDto existingCategory = categoryRepository.findByCategoryId(categoryDto.getCategoryId()).orElse(null);
         if (existingCategory != null) {
             existingCategory.setCategoryName(categoryDto.getCategoryName());
             return categoryRepository.save(existingCategory);

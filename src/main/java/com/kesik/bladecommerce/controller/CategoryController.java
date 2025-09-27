@@ -13,24 +13,29 @@ public class CategoryController {
     public CategoryController(CategoryService categoryService) {
         this.categoryService = categoryService;
     }
-    @GetMapping(path = "/getAllCategories")
+    @GetMapping
     public List<CategoryDto> getAllCategories() {
         return categoryService.getAllCategories();
     }
-    @GetMapping(path = "/getCategoryById")
-    public CategoryDto getCategoryById(Integer categoryId) {
+
+    @GetMapping("/{categoryId}")
+    public CategoryDto getCategoryById(@PathVariable Integer categoryId) {
         return categoryService.getCategoryById(categoryId);
     }
-    @PostMapping(path = "/addCategory")
-    public CategoryDto addCategory(@RequestBody CategoryDto categoryDto) {
+
+    @PostMapping
+    public CategoryDto createCategory(@RequestBody CategoryDto categoryDto) {
         return categoryService.addCategory(categoryDto);
     }
-    @PostMapping(path = "/updateCategory")
-    public CategoryDto updateCategory(@RequestBody CategoryDto categoryDto) {
+
+    @PutMapping("/{categoryId}")
+    public CategoryDto updateCategory(@PathVariable Integer categoryId, @RequestBody CategoryDto categoryDto) {
+        categoryDto.setCategoryId(categoryId);
         return categoryService.updateCategory(categoryDto);
     }
-    @GetMapping(path = "/deleteCategory")
-    public void deleteCategory(Integer categoryId) {
+
+    @DeleteMapping("/{categoryId}")
+    public void deleteCategory(@PathVariable Integer categoryId) {
         categoryService.deleteCategory(categoryId);
     }
 }
