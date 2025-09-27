@@ -27,7 +27,14 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryDto addCategory(CategoryDto categoryDto) {
-        categoryDto.setCategoryId(categoryRepository.findAll().size() + 1);
+        // Find the maximum categoryId and add 1 to ensure uniqueness
+        List<CategoryDto> allCategories = categoryRepository.findAll();
+        Integer maxId = allCategories.stream()
+                .filter(cat -> cat.getCategoryId() != null)
+                .mapToInt(CategoryDto::getCategoryId)
+                .max()
+                .orElse(0);
+        categoryDto.setCategoryId(maxId + 1);
         return categoryRepository.save(categoryDto);
     }
 

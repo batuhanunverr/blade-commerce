@@ -9,6 +9,7 @@ import java.util.List;
 @Document(collection = "orders")
 public class OrderDto {
     private String id;
+    private String orderNumber; // Human-readable order identifier
     private String orderDate;
     private String conversationId;
     private OrderStatusDto orderStatus;

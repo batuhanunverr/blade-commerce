@@ -6,23 +6,28 @@ import com.kesik.bladecommerce.dto.knife.KnifeDto;
 import com.kesik.bladecommerce.dto.order.KnifeOrderDto;
 import com.kesik.bladecommerce.dto.order.OrderDto;
 import com.kesik.bladecommerce.service.KnifeService;
+import com.kesik.bladecommerce.service.OrderService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
 @Component
 public class OrderMapper {
     private static KnifeService knifeService = null;
+    private static OrderService orderService = null;
 
     @Autowired
-    public OrderMapper(KnifeService knifeService) {
+    public OrderMapper(KnifeService knifeService, OrderService orderService) {
         OrderMapper.knifeService = knifeService;
+        OrderMapper.orderService = orderService;
     }
 
     @Transactional
@@ -33,7 +38,14 @@ public class OrderMapper {
                 log.warn("Buyer information is missing in the order request: {}", orderRequest.getConversationId());
                 throw new IllegalArgumentException("Buyer information is required.");
             }
-            orderDto.setOrderDate(LocalDate.now().toString());
+
+            String currentDate = LocalDate.now().toString();
+            orderDto.setOrderDate(currentDate);
+
+            // Generate order number: ORD-YYYYMMDD-NNN
+            String orderNumber = generateOrderNumber(currentDate);
+            orderDto.setOrderNumber(orderNumber);
+            log.info("Generated order number: {}", orderNumber);
             orderDto.setShippingAddress(
                     orderRequest.getShippingAddress() != null ? orderRequest.getShippingAddress().getAddress() : null
             );
@@ -106,5 +118,47 @@ public class OrderMapper {
         knifeOrderDto.setSelectedSize(knife.getSelectedSize());
         knifeOrderDto.setCustomerNote(knife.getNote());
         return knifeOrderDto;
+    }
+
+    /**
+     * Generates a unique order number using hash-based approach
+     * Format: ORD-XXXXXXXX (e.g., ORD-A7B8C9D2)
+     * Uses hash of timestamp, date, and daily count for security
+     *
+     * @param dateString The order date in YYYY-MM-DD format
+     * @return Generated order number
+     */
+    private static String generateOrderNumber(String dateString) {
+        try {
+            // Get daily order count for uniqueness
+            long dailyOrderCount = orderService.getOrderCountForDate(dateString);
+
+            // Create unique input for hashing
+            long timestamp = System.currentTimeMillis();
+            String input = timestamp + ":" + dateString + ":" + (dailyOrderCount + 1) + ":BLADE_COMMERCE_SALT_2025";
+
+            // Generate SHA-256 hash and take first 8 characters
+            java.security.MessageDigest md = java.security.MessageDigest.getInstance("SHA-256");
+            byte[] hashBytes = md.digest(input.getBytes("UTF-8"));
+
+            // Convert to hex and take first 8 characters, make uppercase
+            StringBuilder hexString = new StringBuilder();
+            for (int i = 0; i < Math.min(4, hashBytes.length); i++) {
+                String hex = Integer.toHexString(0xff & hashBytes[i]);
+                if (hex.length() == 1) {
+                    hexString.append('0');
+                }
+                hexString.append(hex);
+            }
+
+            String orderCode = hexString.toString().toUpperCase();
+            return "ORD-" + orderCode;
+
+        } catch (Exception e) {
+            log.error("Error generating hash-based order number for date {}: {}", dateString, e.getMessage());
+            // Fallback: random alphanumeric code
+            String randomCode = Long.toString(System.currentTimeMillis(), 36).substring(2, 10).toUpperCase();
+            return "ORD-" + randomCode;
+        }
     }
 }

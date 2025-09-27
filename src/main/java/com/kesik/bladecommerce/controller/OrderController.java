@@ -5,6 +5,7 @@ import com.kesik.bladecommerce.dto.knife.KnifeDto;
 import com.kesik.bladecommerce.dto.order.AddOrderDto;
 import com.kesik.bladecommerce.dto.order.OrderDto;
 import com.kesik.bladecommerce.dto.order.OrderKnifeDto;
+import com.kesik.bladecommerce.dto.order.OrderStatistics;
 import com.kesik.bladecommerce.dto.order.OrderStatusDto;
 import com.kesik.bladecommerce.service.KnifeService;
 import com.kesik.bladecommerce.service.OrderService;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import lombok.extern.slf4j.Slf4j;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -75,9 +77,28 @@ public class OrderController {
                                        @RequestParam(required = false) String endDate,
                                        @RequestParam(required = false, defaultValue = "1") int sortDirection,
                                        @RequestParam(required = false) String status,
+                                       @RequestParam(required = false) String paymentId,
+                                       @RequestParam(required = false) String conversationId,
+                                       @RequestParam(required = false) String shippingCity,
+                                       @RequestParam(required = false) String adminNote,
                                        @RequestParam(defaultValue = "1") int page,
                                        @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
-        return orderService.searchOrders(searchTerm, minPrice, maxPrice, startDate, endDate, sortDirection, status, pageable);
+        return orderService.searchOrders(searchTerm, minPrice, maxPrice, startDate, endDate,
+                                       sortDirection, status, paymentId, conversationId,
+                                       shippingCity, adminNote, pageable);
+    }
+
+    @GetMapping(path = "/statistics")
+    public OrderStatistics getOrderStatistics(@RequestParam(required = false) String startDate,
+                                             @RequestParam(required = false) String endDate) {
+        log.info("Received request for order statistics from {} to {}", startDate, endDate);
+        return orderService.getOrderStatistics(startDate, endDate);
+    }
+
+    @PostMapping(path = "/migrate-order-numbers")
+    public Map<String, Object> migrateOrderNumbers() {
+        log.info("Starting migration of existing orders to add order numbers");
+        return orderService.migrateExistingOrderNumbers();
     }
 }
