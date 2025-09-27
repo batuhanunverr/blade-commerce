@@ -106,8 +106,11 @@ public class OrderServiceImpl implements OrderService {
 
         if (searchTerm != null && !searchTerm.isBlank()) {
             criteriaList.add(new Criteria().orOperator(
-                    Criteria.where("knife.name").regex(searchTerm, "i"),
-                    Criteria.where("knife.description").regex(searchTerm, "i")
+                    Criteria.where("userName").regex(searchTerm, "i"),
+                    Criteria.where("userSurname").regex(searchTerm, "i"),
+                    Criteria.where("email").regex(searchTerm, "i"),
+                    Criteria.where("phoneNumber").regex(searchTerm, "i"),
+                    Criteria.where("id").regex(searchTerm, "i")
             ));
         }
 
@@ -128,7 +131,12 @@ public class OrderServiceImpl implements OrderService {
         }
 
         if (status != null && !status.isBlank()) {
-            criteriaList.add(Criteria.where("orderStatus").is(status));
+            try {
+                int statusCode = Integer.parseInt(status);
+                criteriaList.add(Criteria.where("orderStatus.orderStatusCode").is(statusCode));
+            } catch (NumberFormatException e) {
+                log.warn("Invalid status format: {}", status);
+            }
         }
 
         Criteria criteria;
@@ -137,7 +145,7 @@ public class OrderServiceImpl implements OrderService {
         } else {
             criteria = new Criteria().andOperator(criteriaList.toArray(new Criteria[0]));
         }
-        Sort sort = sortDirection == 1 ? Sort.by("totalAmount").ascending() : Sort.by("totalAmount").descending();
+        Sort sort = sortDirection == 1 ? Sort.by("orderDate").ascending() : Sort.by("orderDate").descending();
         Query query = new Query(criteria).with(pageable).with(sort);
 
         List<OrderDto> orders = mongoTemplate.find(query, OrderDto.class);
