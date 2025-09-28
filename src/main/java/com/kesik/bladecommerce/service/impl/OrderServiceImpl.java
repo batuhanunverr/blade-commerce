@@ -40,17 +40,21 @@ public class OrderServiceImpl implements OrderService {
     private final MongoTemplate mongoTemplate;
     private final OrderStatusHolder orderStatusHolder;
     private final MailService mailService;
+    private final OrderMapper orderMapper;
 
-    public OrderServiceImpl(OrderRepository orderRepository, MongoTemplate mongoTemplate, OrderStatusHolder orderStatusHolder, MailService mailService) {
+    public OrderServiceImpl(OrderRepository orderRepository, MongoTemplate mongoTemplate, OrderStatusHolder orderStatusHolder, MailService mailService, OrderMapper orderMapper) {
         this.orderRepository = orderRepository;
         this.mongoTemplate = mongoTemplate;
         this.orderStatusHolder = orderStatusHolder;
         this.mailService = mailService;
+        this.orderMapper = orderMapper;
     }
 
     @Override
     public OrderDto addOrder(OrderRequestDto orderDto) {
-        OrderDto order = OrderMapper.mapOrderRequestToOrder(orderDto);
+        String currentDate = java.time.LocalDate.now().toString();
+        long dailyOrderCount = getOrderCountForDate(currentDate);
+        OrderDto order = orderMapper.mapOrderRequestToOrder(orderDto, dailyOrderCount);
         order.setOrderStatus(orderStatusHolder.getOrderStatusByCode(1));
         return orderRepository.save(order);
     }
@@ -197,7 +201,9 @@ public class OrderServiceImpl implements OrderService {
         } else {
             criteria = new Criteria().andOperator(criteriaList.toArray(new Criteria[0]));
         }
-        Sort sort = sortDirection == 1 ? Sort.by("orderDate").ascending() : Sort.by("orderDate").descending();
+        Sort sort = sortDirection == 1 ?
+            Sort.by("orderDate").ascending().and(Sort.by("_id").ascending()) :
+            Sort.by("orderDate").descending().and(Sort.by("_id").descending());
         Query query = new Query(criteria).with(pageable).with(sort);
 
         List<OrderDto> orders = mongoTemplate.find(query, OrderDto.class);

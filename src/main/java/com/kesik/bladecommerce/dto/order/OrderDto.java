@@ -1,11 +1,17 @@
 package com.kesik.bladecommerce.dto.order;
 
 import com.kesik.bladecommerce.dto.iyzico.BasketItemDto;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Document(collection = "orders")
 public class OrderDto {
     private String id;
@@ -16,7 +22,7 @@ public class OrderDto {
     private String shippingAddress;
     private String billingAddress;
     private Double totalAmount;
-    private List<KnifeOrderDto> knife;
+    private List<KnifeOrderDto> knives;
     private String history;
     private String userName;
     private String userSurname;

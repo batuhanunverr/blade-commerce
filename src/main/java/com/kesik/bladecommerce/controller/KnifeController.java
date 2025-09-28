@@ -32,12 +32,11 @@ public class KnifeController {
                                                 @RequestParam(required = false) String knifeType,
                                                 @RequestParam(required = false) String bladeMaterial,
                                                 @RequestParam(defaultValue = "asc") String sortDirection,
-                                                @RequestParam(defaultValue = "1") int page,
+                                                @RequestParam(defaultValue = "0") int page,
                                                 @RequestParam(defaultValue = "20") int size) {
 
-        // Convert 1-based page to 0-based for Spring Boot
-        int springBootPage = Math.max(0, page - 1);
-        Pageable pageable = PageRequest.of(springBootPage, size);
+        // Page is already 0-based from frontend conversion
+        Pageable pageable = PageRequest.of(page, size);
 
         // Get paginated results from service
         Page<KnifeDto> knivePage = knifeService.searchKnivesPageable(
@@ -45,8 +44,8 @@ public class KnifeController {
             knifeType, bladeMaterial, sortDirection, pageable
         );
 
-        // Return 1-based pagination response
-        return PaginatedResponse.fromPage(knivePage, page);
+        // Return 1-based pagination response (auto-converts 0-based Spring Boot page to 1-based)
+        return PaginatedResponse.fromPage(knivePage);
     }
 
     // Get single knife by ID

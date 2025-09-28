@@ -82,18 +82,17 @@ public class OrderController {
                                                    @RequestParam(required = false) String conversationId,
                                                    @RequestParam(required = false) String shippingCity,
                                                    @RequestParam(required = false) String adminNote,
-                                                   @RequestParam(defaultValue = "1") int page,
+                                                   @RequestParam(defaultValue = "0") int page,
                                                    @RequestParam(defaultValue = "20") int size) {
-        // Convert 1-based page to 0-based for Spring Boot
-        int springBootPage = Math.max(0, page - 1);
-        Pageable pageable = PageRequest.of(springBootPage, size);
+        // Page is already 0-based from frontend conversion
+        Pageable pageable = PageRequest.of(page, size);
 
         Page<OrderDto> orderPage = orderService.searchOrders(searchTerm, minPrice, maxPrice, startDate, endDate,
                                                             sortDirection, status, paymentId, conversationId,
                                                             shippingCity, adminNote, pageable);
 
-        // Return 1-based pagination response
-        return PaginatedResponse.fromPage(orderPage, page);
+        // Return 1-based pagination response (auto-converts 0-based Spring Boot page to 1-based)
+        return PaginatedResponse.fromPage(orderPage);
     }
 
     @GetMapping(path = "/statistics")

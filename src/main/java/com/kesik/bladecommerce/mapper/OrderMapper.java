@@ -6,32 +6,28 @@ import com.kesik.bladecommerce.dto.knife.KnifeDto;
 import com.kesik.bladecommerce.dto.order.KnifeOrderDto;
 import com.kesik.bladecommerce.dto.order.OrderDto;
 import com.kesik.bladecommerce.service.KnifeService;
-import com.kesik.bladecommerce.service.OrderService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
 @Component
 public class OrderMapper {
-    private static KnifeService knifeService = null;
-    private static OrderService orderService = null;
+    private final KnifeService knifeService;
 
     @Autowired
-    public OrderMapper(KnifeService knifeService, OrderService orderService) {
-        OrderMapper.knifeService = knifeService;
-        OrderMapper.orderService = orderService;
+    public OrderMapper(KnifeService knifeService) {
+        this.knifeService = knifeService;
     }
 
     @Transactional
-    public static OrderDto mapOrderRequestToOrder(OrderRequestDto orderRequest) {
+    public OrderDto mapOrderRequestToOrder(OrderRequestDto orderRequest, long dailyOrderCount) {
         try {
             OrderDto orderDto = new OrderDto();
             if (orderRequest.getBuyer() == null) {
@@ -43,7 +39,7 @@ public class OrderMapper {
             orderDto.setOrderDate(currentDate);
 
             // Generate order number: ORD-YYYYMMDD-NNN
-            String orderNumber = generateOrderNumber(currentDate);
+            String orderNumber = generateOrderNumber(currentDate, dailyOrderCount);
             orderDto.setOrderNumber(orderNumber);
             log.info("Generated order number: {}", orderNumber);
             orderDto.setShippingAddress(
@@ -93,7 +89,7 @@ public class OrderMapper {
                 knifeOrderDto.setStockQuantity(quantity);
                 orderKnifes.add(knifeOrderDto);
             }
-            orderDto.setKnife(orderKnifes);
+            orderDto.setKnives(orderKnifes);
             return orderDto;
         } catch (Exception e) {
             log.error("Error mapping OrderRequest to Order: {}", e.getMessage(), e);
@@ -101,7 +97,7 @@ public class OrderMapper {
         }
     }
 
-    private static KnifeOrderDto generateKnifeOrder(KnifeDto knifeDto, BasketItemDto knife) {
+    private KnifeOrderDto generateKnifeOrder(KnifeDto knifeDto, BasketItemDto knife) {
         KnifeOrderDto knifeOrderDto = new KnifeOrderDto();
         knifeOrderDto.setId(knifeDto.getId());
         knifeOrderDto.setName(knifeDto.getName());
@@ -126,12 +122,11 @@ public class OrderMapper {
      * Uses hash of timestamp, date, and daily count for security
      *
      * @param dateString The order date in YYYY-MM-DD format
+     * @param dailyOrderCount The count of orders for the given date
      * @return Generated order number
      */
-    private static String generateOrderNumber(String dateString) {
+    private String generateOrderNumber(String dateString, long dailyOrderCount) {
         try {
-            // Get daily order count for uniqueness
-            long dailyOrderCount = orderService.getOrderCountForDate(dateString);
 
             // Create unique input for hashing
             long timestamp = System.currentTimeMillis();
@@ -139,7 +134,7 @@ public class OrderMapper {
 
             // Generate SHA-256 hash and take first 8 characters
             java.security.MessageDigest md = java.security.MessageDigest.getInstance("SHA-256");
-            byte[] hashBytes = md.digest(input.getBytes("UTF-8"));
+            byte[] hashBytes = md.digest(input.getBytes(StandardCharsets.UTF_8));
 
             // Convert to hex and take first 8 characters, make uppercase
             StringBuilder hexString = new StringBuilder();
