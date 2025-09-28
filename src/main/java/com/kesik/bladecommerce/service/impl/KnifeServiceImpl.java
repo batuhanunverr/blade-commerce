@@ -7,6 +7,8 @@ import com.kesik.bladecommerce.repository.knife.KnifeRepository;
 import com.kesik.bladecommerce.service.CategoryService;
 import com.kesik.bladecommerce.service.CloudinaryService;
 import com.kesik.bladecommerce.service.KnifeService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -54,6 +56,35 @@ public class KnifeServiceImpl implements KnifeService {
             return mongoTemplate.find(query, KnifeDto.class);
         } catch (Exception e) {
             throw new RuntimeException("Error searching knives: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public Page<KnifeDto> searchKnivesPageable(String searchTerm, Integer categoryId, Double minPrice, Double maxPrice,
+                                              String knifeType, String bladeMaterial, String sortDirection, Pageable pageable) {
+        try {
+            Query query = new Query();
+            List<Criteria> criteriaList = buildSearchCriteria(searchTerm, categoryId, minPrice, maxPrice, knifeType, bladeMaterial);
+
+            if (!criteriaList.isEmpty()) {
+                query.addCriteria(new Criteria().andOperator(criteriaList.toArray(new Criteria[0])));
+            }
+
+            // Add sorting
+            query.with(getSort(sortDirection));
+
+            // Get total count for pagination
+            long total = mongoTemplate.count(query, KnifeDto.class);
+
+            // Apply pagination
+            query.with(pageable);
+
+            // Execute query
+            List<KnifeDto> knives = mongoTemplate.find(query, KnifeDto.class);
+
+            return new PageImpl<>(knives, pageable, total);
+        } catch (Exception e) {
+            throw new RuntimeException("Error searching knives with pagination: " + e.getMessage(), e);
         }
     }
 

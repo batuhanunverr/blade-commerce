@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 @Service
@@ -21,11 +22,11 @@ public class CloudinaryServiceImpl implements CloudinaryService {
     private final String apiSecret = "YMAACTcENDc_w1tpKzxuM9hceaA";
 
     public CloudinaryServiceImpl() {
-        cloudinary = new Cloudinary(ObjectUtils.asMap(
-                "cloud_name", cloudName,
-                "api_key", apiKey,
-                "api_secret", apiSecret
-        ));
+        Map<String, Object> config = new HashMap<>();
+        config.put("cloud_name", cloudName);
+        config.put("api_key", apiKey);
+        config.put("api_secret", apiSecret);
+        cloudinary = new Cloudinary(config);
     }
 
     public String uploadFile(MultipartFile file) throws IOException {
@@ -36,8 +37,8 @@ public class CloudinaryServiceImpl implements CloudinaryService {
                 throw new IllegalArgumentException("File cannot be empty");
             }
 
-            Map<String, Object> uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
-            String secureUrl = uploadResult.get("secure_url").toString();
+            Map<?, ?> rawResult = cloudinary.uploader().upload(file.getBytes(), new HashMap<String, Object>());
+            String secureUrl = rawResult.get("secure_url").toString();
 
             logger.info("Successfully uploaded file to Cloudinary: {}", secureUrl);
             return secureUrl;
@@ -67,8 +68,8 @@ public class CloudinaryServiceImpl implements CloudinaryService {
 
             logger.debug("Uploading image with data URI prefix: {}", dataUri.substring(0, Math.min(50, dataUri.length())));
 
-            Map<String, Object> uploadResult = cloudinary.uploader().upload(dataUri, ObjectUtils.emptyMap());
-            String secureUrl = uploadResult.get("secure_url").toString();
+            Map<?, ?> rawResult = cloudinary.uploader().upload(dataUri, new HashMap<String, Object>());
+            String secureUrl = rawResult.get("secure_url").toString();
 
             logger.info("Successfully uploaded image to Cloudinary: {}", secureUrl);
             return secureUrl;

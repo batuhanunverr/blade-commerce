@@ -1,5 +1,6 @@
 package com.kesik.bladecommerce.controller;
 
+import com.kesik.bladecommerce.dto.PaginatedResponse;
 import com.kesik.bladecommerce.dto.iyzico.OrderRequestDto;
 import com.kesik.bladecommerce.dto.knife.KnifeDto;
 import com.kesik.bladecommerce.dto.order.AddOrderDto;
@@ -70,23 +71,29 @@ public class OrderController {
     }
 
     @GetMapping(path = "/search")
-    public Page<OrderDto> searchOrders(@RequestParam(required = false) String searchTerm,
-                                       @RequestParam(required = false) String minPrice,
-                                       @RequestParam(required = false) String maxPrice,
-                                       @RequestParam(required = false) String startDate,
-                                       @RequestParam(required = false) String endDate,
-                                       @RequestParam(required = false, defaultValue = "1") int sortDirection,
-                                       @RequestParam(required = false) String status,
-                                       @RequestParam(required = false) String paymentId,
-                                       @RequestParam(required = false) String conversationId,
-                                       @RequestParam(required = false) String shippingCity,
-                                       @RequestParam(required = false) String adminNote,
-                                       @RequestParam(defaultValue = "1") int page,
-                                       @RequestParam(defaultValue = "10") int size) {
-        Pageable pageable = PageRequest.of(page - 1, size);
-        return orderService.searchOrders(searchTerm, minPrice, maxPrice, startDate, endDate,
-                                       sortDirection, status, paymentId, conversationId,
-                                       shippingCity, adminNote, pageable);
+    public PaginatedResponse<OrderDto> searchOrders(@RequestParam(required = false) String searchTerm,
+                                                   @RequestParam(required = false) String minPrice,
+                                                   @RequestParam(required = false) String maxPrice,
+                                                   @RequestParam(required = false) String startDate,
+                                                   @RequestParam(required = false) String endDate,
+                                                   @RequestParam(required = false, defaultValue = "1") int sortDirection,
+                                                   @RequestParam(required = false) String status,
+                                                   @RequestParam(required = false) String paymentId,
+                                                   @RequestParam(required = false) String conversationId,
+                                                   @RequestParam(required = false) String shippingCity,
+                                                   @RequestParam(required = false) String adminNote,
+                                                   @RequestParam(defaultValue = "1") int page,
+                                                   @RequestParam(defaultValue = "20") int size) {
+        // Convert 1-based page to 0-based for Spring Boot
+        int springBootPage = Math.max(0, page - 1);
+        Pageable pageable = PageRequest.of(springBootPage, size);
+
+        Page<OrderDto> orderPage = orderService.searchOrders(searchTerm, minPrice, maxPrice, startDate, endDate,
+                                                            sortDirection, status, paymentId, conversationId,
+                                                            shippingCity, adminNote, pageable);
+
+        // Return 1-based pagination response
+        return PaginatedResponse.fromPage(orderPage, page);
     }
 
     @GetMapping(path = "/statistics")

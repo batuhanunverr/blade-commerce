@@ -1,9 +1,13 @@
 package com.kesik.bladecommerce.controller;
 
+import com.kesik.bladecommerce.dto.PaginatedResponse;
 import com.kesik.bladecommerce.dto.knife.AddKnifeRequestDto;
 import com.kesik.bladecommerce.dto.knife.KnifeDto;
 import com.kesik.bladecommerce.dto.knife.UpdateKnifeRequestDto;
 import com.kesik.bladecommerce.service.KnifeService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
@@ -19,23 +23,30 @@ public class KnifeController {
         this.knifeService = knifeService;
     }
 
-    // Get all knives or search with filters
+    // Get all knives or search with filters - with 1-based pagination
     @GetMapping
-    public List<KnifeDto> getKnives(@RequestParam(required = false) String searchTerm,
-                                   @RequestParam(required = false) Integer categoryId,
-                                   @RequestParam(required = false) Double minPrice,
-                                   @RequestParam(required = false) Double maxPrice,
-                                   @RequestParam(required = false) String knifeType,
-                                   @RequestParam(required = false) String bladeMaterial,
-                                   @RequestParam(defaultValue = "asc") String sortDirection,
-                                   @RequestParam(defaultValue = "1") int page,
-                                   @RequestParam(defaultValue = "10") int size) {
-        // If no search parameters, return all knives
-        if (searchTerm == null && categoryId == null && minPrice == null && maxPrice == null
-            && knifeType == null && bladeMaterial == null) {
-            return knifeService.getAllKnives();
-        }
-        return knifeService.searchKnives(searchTerm, categoryId, minPrice, maxPrice, knifeType, bladeMaterial, sortDirection, page, size);
+    public PaginatedResponse<KnifeDto> getKnives(@RequestParam(required = false) String searchTerm,
+                                                @RequestParam(required = false) Integer categoryId,
+                                                @RequestParam(required = false) Double minPrice,
+                                                @RequestParam(required = false) Double maxPrice,
+                                                @RequestParam(required = false) String knifeType,
+                                                @RequestParam(required = false) String bladeMaterial,
+                                                @RequestParam(defaultValue = "asc") String sortDirection,
+                                                @RequestParam(defaultValue = "1") int page,
+                                                @RequestParam(defaultValue = "20") int size) {
+
+        // Convert 1-based page to 0-based for Spring Boot
+        int springBootPage = Math.max(0, page - 1);
+        Pageable pageable = PageRequest.of(springBootPage, size);
+
+        // Get paginated results from service
+        Page<KnifeDto> knivePage = knifeService.searchKnivesPageable(
+            searchTerm, categoryId, minPrice, maxPrice,
+            knifeType, bladeMaterial, sortDirection, pageable
+        );
+
+        // Return 1-based pagination response
+        return PaginatedResponse.fromPage(knivePage, page);
     }
 
     // Get single knife by ID
