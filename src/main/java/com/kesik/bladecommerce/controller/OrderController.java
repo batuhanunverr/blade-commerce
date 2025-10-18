@@ -45,28 +45,34 @@ public class OrderController {
         return orderService.updateOrder(id, orderStatusCode, history, adminNote);
     }
 
-    @GetMapping(path = "/getAllOrderStatus")
+    // Get all order statuses
+    @GetMapping("/status/all")
     public List<OrderStatusDto> getAllOrderStatus() {
         return orderService.getAllOrderStatus();
     }
 
-    @GetMapping(path = "/deleteOrder")
-    public void deleteOrder(String id) {
-        orderService.deleteOrder(id);
-    }
-
-    @GetMapping(path = "/getAllOrders")
+    // Get all orders
+    @GetMapping
     public List<OrderDto> getAllOrders() {
         return orderService.getAllOrders();
     }
 
+    // Get order by ID
     @GetMapping("/{id}")
     public Optional<OrderDto> getOrderById(@PathVariable String id) {
         return orderService.getOrderById(id);
     }
 
-    @GetMapping(path = "/getOrdersByStatus")
-    public List<OrderDto> getOrdersByStatus(int orderStatus) {
+    // Delete order - proper DELETE method
+    @DeleteMapping("/{id}")
+    public void deleteOrder(@PathVariable String id) {
+        log.info("Deleting order: {}", id);
+        orderService.deleteOrder(id);
+    }
+
+    // Get orders by status
+    @GetMapping("/status/{orderStatus}")
+    public List<OrderDto> getOrdersByStatus(@PathVariable int orderStatus) {
         return orderService.getOrdersByStatus(orderStatus);
     }
 
