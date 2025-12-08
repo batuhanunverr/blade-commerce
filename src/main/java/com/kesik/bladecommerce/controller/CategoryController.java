@@ -20,7 +20,12 @@ public class CategoryController {
         this.knifeService = knifeService;
     }
     @GetMapping
-    public List<CategoryDto> getAllCategories() {
+    public List<CategoryDto> getAllCategories(@RequestParam(required = false) Boolean activeOnly) {
+        // If activeOnly=true, return only active categories sorted by displayOrder
+        // Otherwise return all categories sorted by displayOrder
+        if (Boolean.TRUE.equals(activeOnly)) {
+            return categoryService.getActiveCategories();
+        }
         return categoryService.getAllCategories();
     }
 
@@ -66,5 +71,17 @@ public class CategoryController {
         result.put("totalCategories", categories.size());
 
         return result;
+    }
+
+    // Toggle category active/inactive status
+    @PatchMapping("/{categoryId}/toggle-active")
+    public CategoryDto toggleCategoryActive(@PathVariable Integer categoryId) {
+        return categoryService.toggleCategoryActive(categoryId);
+    }
+
+    // Reorder categories by providing ordered list of category IDs
+    @PutMapping("/reorder")
+    public List<CategoryDto> reorderCategories(@RequestBody List<Integer> categoryIds) {
+        return categoryService.reorderCategories(categoryIds);
     }
 }

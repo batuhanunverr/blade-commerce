@@ -51,9 +51,20 @@ public class OrderController {
         return orderService.getAllOrderStatus();
     }
 
-    // Get all orders
+    // Get all orders with pagination support
+    // If page/size params provided, returns paginated response
+    // Otherwise returns all orders (backward compatible)
     @GetMapping
-    public List<OrderDto> getAllOrders() {
+    public Object getAllOrders(
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size) {
+        if (page != null && size != null) {
+            // Return paginated response
+            Pageable pageable = PageRequest.of(page, size);
+            Page<OrderDto> orderPage = orderService.getAllOrdersPaginated(pageable);
+            return PaginatedResponse.fromPage(orderPage);
+        }
+        // Backward compatible - return all orders
         return orderService.getAllOrders();
     }
 

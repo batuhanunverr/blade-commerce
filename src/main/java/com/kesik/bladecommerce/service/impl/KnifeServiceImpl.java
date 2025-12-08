@@ -208,6 +208,76 @@ public class KnifeServiceImpl implements KnifeService {
         return knifeRepository.save(knife);
     }
 
+    /**
+     * Atomically decrement stock quantity using MongoDB's findAndModify.
+     * This prevents overselling in concurrent scenarios.
+     *
+     * @param id Product ID
+     * @param decrementBy Amount to decrement (must be positive)
+     * @return Updated KnifeDto if successful, null if insufficient stock or product not found
+     * @throws IllegalArgumentException if decrementBy is not positive
+     * @throws IllegalStateException if insufficient stock
+     */
+    @Override
+    public KnifeDto decrementStockAtomic(String id, int decrementBy) {
+        if (decrementBy <= 0) {
+            throw new IllegalArgumentException("Decrement amount must be positive");
+        }
+
+        // Use atomic findAndModify to check and decrement in one operation
+        // This ensures no race condition between check and update
+        Query query = new Query(Criteria.where("_id").is(id)
+                .and("stockQuantity").gte(decrementBy));
+
+        org.springframework.data.mongodb.core.query.Update update =
+                new org.springframework.data.mongodb.core.query.Update()
+                        .inc("stockQuantity", -decrementBy);
+
+        org.springframework.data.mongodb.core.FindAndModifyOptions options =
+                org.springframework.data.mongodb.core.FindAndModifyOptions.options()
+                        .returnNew(true);
+
+        KnifeDto updatedKnife = mongoTemplate.findAndModify(query, update, options, KnifeDto.class);
+
+        if (updatedKnife == null) {
+            // Either product doesn't exist or insufficient stock
+            KnifeDto existing = knifeRepository.findById(id).orElse(null);
+            if (existing == null) {
+                throw new IllegalArgumentException("Product not found: " + id);
+            } else {
+                throw new IllegalStateException(
+                        String.format("Insufficient stock for %s. Requested: %d, Available: %d",
+                                existing.getName(), decrementBy, existing.getStockQuantity()));
+            }
+        }
+
+        return updatedKnife;
+    }
+
+    /**
+     * Atomically restore stock quantity (rollback operation).
+     * Used when order creation fails after stock was decremented.
+     *
+     * @param id Product ID
+     * @param incrementBy Amount to restore
+     */
+    @Override
+    public void incrementStockAtomic(String id, int incrementBy) {
+        if (incrementBy <= 0) {
+            return;
+        }
+
+        org.springframework.data.mongodb.core.query.Update update =
+                new org.springframework.data.mongodb.core.query.Update()
+                        .inc("stockQuantity", incrementBy);
+
+        mongoTemplate.updateFirst(
+                new Query(Criteria.where("_id").is(id)),
+                update,
+                KnifeDto.class
+        );
+    }
+
     @Override
     public void deleteKnife(String id) {
         knifeRepository.deleteById(id);

@@ -103,6 +103,17 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public Page<OrderDto> getAllOrdersPaginated(Pageable pageable) {
+        // Sort by orderDate descending by default
+        Pageable sortedPageable = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                Sort.by("orderDate").descending().and(Sort.by("_id").descending())
+        );
+        return orderRepository.findAll(sortedPageable);
+    }
+
+    @Override
     public Optional<OrderDto> getOrderById(String id) {
         return orderRepository.findById(id);
     }
