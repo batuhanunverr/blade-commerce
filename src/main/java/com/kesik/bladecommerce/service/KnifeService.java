@@ -27,6 +27,26 @@ public interface KnifeService {
 
     KnifeDto updateKnifeStockQuantity(String id, int quantity);
 
+    /**
+     * Atomically decrement stock quantity.
+     * Prevents overselling in concurrent scenarios.
+     *
+     * @param id Product ID
+     * @param decrementBy Amount to decrement (must be positive)
+     * @return Updated KnifeDto
+     * @throws IllegalArgumentException if product not found
+     * @throws IllegalStateException if insufficient stock
+     */
+    KnifeDto decrementStockAtomic(String id, int decrementBy);
+
+    /**
+     * Atomically restore stock quantity (rollback operation).
+     *
+     * @param id Product ID
+     * @param incrementBy Amount to restore
+     */
+    void incrementStockAtomic(String id, int incrementBy);
+
     void deleteKnife(String id);
 
     List<String> getKnifeTypes();

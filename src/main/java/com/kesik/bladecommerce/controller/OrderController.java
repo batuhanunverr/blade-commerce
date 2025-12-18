@@ -45,28 +45,45 @@ public class OrderController {
         return orderService.updateOrder(id, orderStatusCode, history, adminNote);
     }
 
-    @GetMapping(path = "/getAllOrderStatus")
+    // Get all order statuses
+    @GetMapping("/status/all")
     public List<OrderStatusDto> getAllOrderStatus() {
         return orderService.getAllOrderStatus();
     }
 
-    @GetMapping(path = "/deleteOrder")
-    public void deleteOrder(String id) {
-        orderService.deleteOrder(id);
-    }
-
-    @GetMapping(path = "/getAllOrders")
-    public List<OrderDto> getAllOrders() {
+    // Get all orders with pagination support
+    // If page/size params provided, returns paginated response
+    // Otherwise returns all orders (backward compatible)
+    @GetMapping
+    public Object getAllOrders(
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size) {
+        if (page != null && size != null) {
+            // Return paginated response
+            Pageable pageable = PageRequest.of(page, size);
+            Page<OrderDto> orderPage = orderService.getAllOrdersPaginated(pageable);
+            return PaginatedResponse.fromPage(orderPage);
+        }
+        // Backward compatible - return all orders
         return orderService.getAllOrders();
     }
 
+    // Get order by ID
     @GetMapping("/{id}")
     public Optional<OrderDto> getOrderById(@PathVariable String id) {
         return orderService.getOrderById(id);
     }
 
-    @GetMapping(path = "/getOrdersByStatus")
-    public List<OrderDto> getOrdersByStatus(int orderStatus) {
+    // Delete order - proper DELETE method
+    @DeleteMapping("/{id}")
+    public void deleteOrder(@PathVariable String id) {
+        log.info("Deleting order: {}", id);
+        orderService.deleteOrder(id);
+    }
+
+    // Get orders by status
+    @GetMapping("/status/{orderStatus}")
+    public List<OrderDto> getOrdersByStatus(@PathVariable int orderStatus) {
         return orderService.getOrdersByStatus(orderStatus);
     }
 

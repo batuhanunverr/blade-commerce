@@ -26,8 +26,22 @@ public class OrderMapper {
         this.knifeService = knifeService;
     }
 
+    /**
+     * Maps an OrderRequestDto to an OrderDto with atomic stock management.
+     * Uses findAndModify for atomic stock decrement to prevent overselling.
+     * Includes rollback mechanism if any part of the order fails.
+     *
+     * @param orderRequest The order request from Iyzico
+     * @param dailyOrderCount The daily order count for order number generation
+     * @return The mapped OrderDto ready for persistence
+     * @throws IllegalArgumentException for validation errors
+     * @throws IllegalStateException for stock availability issues
+     */
     @Transactional
     public OrderDto mapOrderRequestToOrder(OrderRequestDto orderRequest, long dailyOrderCount) {
+        // Track decremented stock for rollback
+        List<StockChange> stockChanges = new ArrayList<>();
+
         try {
             OrderDto orderDto = new OrderDto();
             if (orderRequest.getBuyer() == null) {
@@ -38,7 +52,7 @@ public class OrderMapper {
             String currentDate = LocalDate.now().toString();
             orderDto.setOrderDate(currentDate);
 
-            // Generate order number: ORD-YYYYMMDD-NNN
+            // Generate order number: ORD-XXXXXXXX
             String orderNumber = generateOrderNumber(currentDate, dailyOrderCount);
             orderDto.setOrderNumber(orderNumber);
             log.info("Generated order number: {}", orderNumber);
@@ -63,39 +77,85 @@ public class OrderMapper {
             orderDto.setPaymentId(orderRequest.getPaymentId());
             orderDto.setHistory("Sipariş oluşturuldu.");
             List<KnifeOrderDto> orderKnifes = new ArrayList<>();
+
             for (BasketItemDto knife : orderRequest.getBasketItems()) {
                 KnifeDto knifeDto = knifeService.getKnifeById(knife.getId());
                 if (knifeDto == null) {
                     log.info("Knife not found with id: {}", knife.getId());
+                    rollbackStockChanges(stockChanges);
                     throw new IllegalArgumentException("Knife not found with id: " + knife.getId());
                 }
-                if (knife.getQuantity() > knifeDto.getStockQuantity()) {
-                    log.info("Insufficient stock for knife: {}. Requested: {}, Available: {}",
-                            knifeDto.getName(), knife.getQuantity(), knifeDto.getStockQuantity());
-                    throw new IllegalArgumentException("Insufficient stock for knife: " + knifeDto.getName());
-                }
-                if(knifeDto.getKnifeSizes() != null){
+
+                // Validate size selection
+                if (knifeDto.getKnifeSizes() != null) {
                     if (knife.getSelectedSize() != null && !knifeDto.getKnifeSizes().contains(knife.getSelectedSize())) {
                         log.info("Invalid knife size selected for knife: {}. Selected size: {}, Available sizes: {}",
                                 knifeDto.getName(), knife.getSelectedSize(), knifeDto.getKnifeSizes());
+                        rollbackStockChanges(stockChanges);
                         throw new IllegalArgumentException("Invalid knife size selected for knife: " + knifeDto.getName());
                     }
                 }
 
-                KnifeOrderDto knifeOrderDto = generateKnifeOrder(knifeDto, knife);
-                int quantity = knifeDto.getStockQuantity() - knife.getQuantity();
-                knifeService.updateKnifeStockQuantity(knifeDto.getId(), quantity);
-                log.info("Updated stock for knife: {}. New stock quantity: {}", knifeDto.getName(), quantity);
-                knifeOrderDto.setStockQuantity(quantity);
-                orderKnifes.add(knifeOrderDto);
+                // Atomically decrement stock - this prevents overselling
+                try {
+                    KnifeDto updatedKnife = knifeService.decrementStockAtomic(knife.getId(), knife.getQuantity());
+                    stockChanges.add(new StockChange(knife.getId(), knife.getQuantity()));
+                    log.info("Atomically decremented stock for knife: {}. New stock: {}",
+                            knifeDto.getName(), updatedKnife.getStockQuantity());
+
+                    KnifeOrderDto knifeOrderDto = generateKnifeOrder(knifeDto, knife);
+                    knifeOrderDto.setStockQuantity(updatedKnife.getStockQuantity());
+                    orderKnifes.add(knifeOrderDto);
+
+                } catch (IllegalStateException e) {
+                    // Insufficient stock - rollback and throw
+                    log.warn("Insufficient stock for knife: {}. Requested: {}, Error: {}",
+                            knifeDto.getName(), knife.getQuantity(), e.getMessage());
+                    rollbackStockChanges(stockChanges);
+                    throw new IllegalArgumentException("Insufficient stock for knife: " + knifeDto.getName());
+                }
             }
+
             orderDto.setKnives(orderKnifes);
             return orderDto;
+
+        } catch (IllegalArgumentException e) {
+            // Known validation errors - rollback already done above
+            throw e;
+
         } catch (Exception e) {
+            // Unexpected error - rollback all stock changes
             log.error("Error mapping OrderRequest to Order: {}", e.getMessage(), e);
+            rollbackStockChanges(stockChanges);
             throw new RuntimeException("Error mapping OrderRequest to Order: " + e.getMessage(), e);
         }
     }
+
+    /**
+     * Rollback stock changes in case of order creation failure.
+     * Restores stock for all products that were decremented.
+     */
+    private void rollbackStockChanges(List<StockChange> stockChanges) {
+        if (stockChanges.isEmpty()) {
+            return;
+        }
+
+        log.info("Rolling back {} stock changes", stockChanges.size());
+        for (StockChange change : stockChanges) {
+            try {
+                knifeService.incrementStockAtomic(change.productId, change.quantity);
+                log.info("Rolled back stock for product: {} (+{})", change.productId, change.quantity);
+            } catch (Exception e) {
+                // Log but don't throw - best effort rollback
+                log.error("Failed to rollback stock for product: {}. Manual correction may be needed.", change.productId, e);
+            }
+        }
+    }
+
+    /**
+     * Tracks stock changes for rollback purposes.
+     */
+    private record StockChange(String productId, int quantity) {}
 
     private KnifeOrderDto generateKnifeOrder(KnifeDto knifeDto, BasketItemDto knife) {
         KnifeOrderDto knifeOrderDto = new KnifeOrderDto();

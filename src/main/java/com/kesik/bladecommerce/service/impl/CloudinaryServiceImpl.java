@@ -5,6 +5,7 @@ import com.cloudinary.utils.ObjectUtils;
 import com.kesik.bladecommerce.service.CloudinaryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,16 +18,31 @@ public class CloudinaryServiceImpl implements CloudinaryService {
 
     private static final Logger logger = LoggerFactory.getLogger(CloudinaryServiceImpl.class);
     private final Cloudinary cloudinary;
-    private final String cloudName = "dqgnkfvrz";
-    private final String apiKey = "314381283678893";
-    private final String apiSecret = "YMAACTcENDc_w1tpKzxuM9hceaA";
 
-    public CloudinaryServiceImpl() {
+    public CloudinaryServiceImpl(
+            @Value("${cloudinary.cloud.name}") String cloudName,
+            @Value("${cloudinary.api.key}") String apiKey,
+            @Value("${cloudinary.api.secret}") String apiSecret
+    ) {
+        logger.info("Initializing Cloudinary service with cloud name: {}", cloudName);
+
+        if (cloudName == null || cloudName.trim().isEmpty()) {
+            throw new IllegalStateException("Cloudinary cloud name is not configured. Please set CLOUDINARY_CLOUD_NAME environment variable.");
+        }
+        if (apiKey == null || apiKey.trim().isEmpty()) {
+            throw new IllegalStateException("Cloudinary API key is not configured. Please set CLOUDINARY_API_KEY environment variable.");
+        }
+        if (apiSecret == null || apiSecret.trim().isEmpty()) {
+            throw new IllegalStateException("Cloudinary API secret is not configured. Please set CLOUDINARY_API_SECRET environment variable.");
+        }
+
         Map<String, Object> config = new HashMap<>();
         config.put("cloud_name", cloudName);
         config.put("api_key", apiKey);
         config.put("api_secret", apiSecret);
         cloudinary = new Cloudinary(config);
+
+        logger.info("Cloudinary service initialized successfully");
     }
 
     public String uploadFile(MultipartFile file) throws IOException {
@@ -37,10 +53,31 @@ public class CloudinaryServiceImpl implements CloudinaryService {
                 throw new IllegalArgumentException("File cannot be empty");
             }
 
-            Map<?, ?> rawResult = cloudinary.uploader().upload(file.getBytes(), new HashMap<String, Object>());
+            // Validate file size (max 5MB)
+            long maxSize = 5 * 1024 * 1024; // 5MB in bytes
+            if (file.getSize() > maxSize) {
+                throw new IllegalArgumentException("File size exceeds maximum allowed (5MB). Current size: " + (file.getSize() / 1024 / 1024) + "MB");
+            }
+
+            // Validate file type
+            String contentType = file.getContentType();
+            if (contentType == null || !contentType.startsWith("image/")) {
+                throw new IllegalArgumentException("Invalid file type. Only images are allowed.");
+            }
+
+            // Configure Cloudinary upload with optimization
+            Map<String, Object> uploadOptions = new HashMap<>();
+            uploadOptions.put("quality", "auto:good");  // Automatic quality optimization
+            uploadOptions.put("fetch_format", "auto");  // Auto format (WebP for supported browsers)
+            uploadOptions.put("width", 1200);           // Max width 1200px
+            uploadOptions.put("height", 1200);          // Max height 1200px
+            uploadOptions.put("crop", "limit");         // Don't upscale, only downscale if needed
+            uploadOptions.put("flags", "progressive");  // Progressive JPEG loading
+
+            Map<?, ?> rawResult = cloudinary.uploader().upload(file.getBytes(), uploadOptions);
             String secureUrl = rawResult.get("secure_url").toString();
 
-            logger.info("Successfully uploaded file to Cloudinary: {}", secureUrl);
+            logger.info("Successfully uploaded and optimized file to Cloudinary: {}", secureUrl);
             return secureUrl;
 
         } catch (Exception e) {
@@ -68,10 +105,19 @@ public class CloudinaryServiceImpl implements CloudinaryService {
 
             logger.debug("Uploading image with data URI prefix: {}", dataUri.substring(0, Math.min(50, dataUri.length())));
 
-            Map<?, ?> rawResult = cloudinary.uploader().upload(dataUri, new HashMap<String, Object>());
+            // Configure Cloudinary upload with optimization (same as uploadFile)
+            Map<String, Object> uploadOptions = new HashMap<>();
+            uploadOptions.put("quality", "auto:good");
+            uploadOptions.put("fetch_format", "auto");
+            uploadOptions.put("width", 1200);
+            uploadOptions.put("height", 1200);
+            uploadOptions.put("crop", "limit");
+            uploadOptions.put("flags", "progressive");
+
+            Map<?, ?> rawResult = cloudinary.uploader().upload(dataUri, uploadOptions);
             String secureUrl = rawResult.get("secure_url").toString();
 
-            logger.info("Successfully uploaded image to Cloudinary: {}", secureUrl);
+            logger.info("Successfully uploaded and optimized image to Cloudinary: {}", secureUrl);
             return secureUrl;
 
         } catch (Exception e) {

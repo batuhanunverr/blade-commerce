@@ -22,6 +22,13 @@ public interface OrderService {
 
     List<OrderDto> getAllOrders();
 
+    /**
+     * Get all orders with pagination support
+     * @param pageable Pagination parameters
+     * @return Page of orders
+     */
+    Page<OrderDto> getAllOrdersPaginated(Pageable pageable);
+
     Optional<OrderDto> getOrderById(String id);
 
     List<OrderDto> getOrdersByStatus(int orderStatus);

@@ -7,6 +7,8 @@ import java.util.List;
 public interface CategoryService {
     List<CategoryDto> getAllCategories();
 
+    List<CategoryDto> getActiveCategories();  // Get only active categories, sorted by displayOrder
+
     CategoryDto getCategoryById(Integer categoryId);
 
     CategoryDto addCategory(CategoryDto categoryDto);
@@ -14,4 +16,8 @@ public interface CategoryService {
     CategoryDto updateCategory(CategoryDto categoryDto);
 
     void deleteCategory(Integer categoryId);
+
+    CategoryDto toggleCategoryActive(Integer categoryId);  // Toggle isActive status
+
+    List<CategoryDto> reorderCategories(List<Integer> categoryIds);  // Reorder by providing ordered list of IDs
 }

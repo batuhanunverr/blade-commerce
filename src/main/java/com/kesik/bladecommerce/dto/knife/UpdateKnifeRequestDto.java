@@ -1,5 +1,6 @@
 package com.kesik.bladecommerce.dto.knife;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -8,6 +9,7 @@ import java.util.List;
 
 @Data
 public class UpdateKnifeRequestDto {
+    @JsonIgnore
     private MultipartFile imageFile; // For file upload
     private String imageBase64; // For base64 upload
 
