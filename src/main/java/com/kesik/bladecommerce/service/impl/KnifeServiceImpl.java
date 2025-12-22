@@ -7,6 +7,7 @@ import com.kesik.bladecommerce.repository.knife.KnifeRepository;
 import com.kesik.bladecommerce.service.CategoryService;
 import com.kesik.bladecommerce.service.CloudinaryService;
 import com.kesik.bladecommerce.service.KnifeService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
+@Slf4j
 public class KnifeServiceImpl implements KnifeService {
     private final KnifeRepository knifeRepository;
     private final MongoTemplate mongoTemplate;
@@ -317,6 +319,7 @@ public class KnifeServiceImpl implements KnifeService {
 
             return imageUrl;
         } catch (IOException e) {
+            log.error("Cloudinary upload failed", e);
             throw new RuntimeException("Error uploading image to server", e);
         }
     }

@@ -3,6 +3,7 @@ package com.kesik.bladecommerce.service.impl;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.kesik.bladecommerce.service.CloudinaryService;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,6 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
+@Slf4j
 public class CloudinaryServiceImpl implements CloudinaryService {
 
     private static final Logger logger = LoggerFactory.getLogger(CloudinaryServiceImpl.class);
