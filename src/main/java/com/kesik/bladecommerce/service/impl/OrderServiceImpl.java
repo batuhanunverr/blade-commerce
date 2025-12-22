@@ -1,19 +1,14 @@
 package com.kesik.bladecommerce.service.impl;
 
 import com.kesik.bladecommerce.dto.iyzico.OrderRequestDto;
-import com.kesik.bladecommerce.dto.knife.KnifeDto;
-import com.kesik.bladecommerce.dto.order.AddOrderDto;
 import com.kesik.bladecommerce.dto.order.OrderDto;
-import com.kesik.bladecommerce.dto.order.OrderKnifeDto;
 import com.kesik.bladecommerce.dto.order.OrderStatistics;
 import com.kesik.bladecommerce.dto.order.OrderStatusDto;
 import com.kesik.bladecommerce.mapper.OrderMapper;
 import com.kesik.bladecommerce.repository.order.OrderRepository;
-import com.kesik.bladecommerce.service.KnifeService;
 import com.kesik.bladecommerce.service.MailService;
 import com.kesik.bladecommerce.service.OrderService;
 import com.kesik.bladecommerce.util.OrderStatusHolder;
-import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,15 +17,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
-import com.mongodb.client.result.UpdateResult;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Service;
-import org.bson.Document;
+
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
