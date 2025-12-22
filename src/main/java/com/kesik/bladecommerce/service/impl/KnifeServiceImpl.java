@@ -318,7 +318,7 @@ public class KnifeServiceImpl implements KnifeService {
             }
 
             return imageUrl;
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error("Cloudinary upload failed", e);
             throw new RuntimeException("Error uploading image to server", e);
         }
