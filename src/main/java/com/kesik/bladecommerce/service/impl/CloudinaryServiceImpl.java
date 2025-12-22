@@ -18,7 +18,6 @@ import java.util.Map;
 @Slf4j
 public class CloudinaryServiceImpl implements CloudinaryService {
 
-    private static final Logger logger = LoggerFactory.getLogger(CloudinaryServiceImpl.class);
     private final Cloudinary cloudinary;
 
     public CloudinaryServiceImpl(
@@ -26,7 +25,7 @@ public class CloudinaryServiceImpl implements CloudinaryService {
             @Value("${cloudinary.api.key}") String apiKey,
             @Value("${cloudinary.api.secret}") String apiSecret
     ) {
-        logger.info("Initializing Cloudinary service with cloud name: {}", cloudName);
+        log.info("Initializing Cloudinary service with cloud name: {}", cloudName);
 
         if (cloudName == null || cloudName.trim().isEmpty()) {
             throw new IllegalStateException("Cloudinary cloud name is not configured. Please set CLOUDINARY_CLOUD_NAME environment variable.");
@@ -44,12 +43,12 @@ public class CloudinaryServiceImpl implements CloudinaryService {
         config.put("api_secret", apiSecret);
         cloudinary = new Cloudinary(config);
 
-        logger.info("Cloudinary service initialized successfully");
+        log.info("Cloudinary service initialized successfully");
     }
 
     public String uploadFile(MultipartFile file) throws IOException {
         try {
-            logger.info("Starting file upload to Cloudinary: {}", file.getOriginalFilename());
+            log.info("Starting file upload to Cloudinary: {}", file.getOriginalFilename());
 
             if (file.isEmpty()) {
                 throw new IllegalArgumentException("File cannot be empty");
@@ -79,17 +78,17 @@ public class CloudinaryServiceImpl implements CloudinaryService {
             Map<?, ?> rawResult = cloudinary.uploader().upload(file.getBytes(), uploadOptions);
             String secureUrl = rawResult.get("secure_url").toString();
 
-            logger.info("Successfully uploaded and optimized file to Cloudinary: {}", secureUrl);
+            log.info("Successfully uploaded and optimized file to Cloudinary: {}", secureUrl);
             return secureUrl;
 
         } catch (Exception e) {
-            logger.error("Failed to upload file to Cloudinary: {}", file.getOriginalFilename(), e);
+            log.error("Failed to upload file to Cloudinary: {}", file.getOriginalFilename(), e);
             throw new IOException("Failed to upload file: " + e.getMessage(), e);
         }
     }
     public String uploadBase64(String base64Image) throws IOException {
         try {
-            logger.info("Starting base64 image upload to Cloudinary");
+            log.info("Starting base64 image upload to Cloudinary");
 
             // Validate base64 string
             if (base64Image == null || base64Image.trim().isEmpty()) {
@@ -105,7 +104,7 @@ public class CloudinaryServiceImpl implements CloudinaryService {
                 dataUri = "data:image/jpeg;base64," + base64Image;
             }
 
-            logger.debug("Uploading image with data URI prefix: {}", dataUri.substring(0, Math.min(50, dataUri.length())));
+            log.debug("Uploading image with data URI prefix: {}", dataUri.substring(0, Math.min(50, dataUri.length())));
 
             // Configure Cloudinary upload with optimization (same as uploadFile)
             Map<String, Object> uploadOptions = new HashMap<>();
@@ -119,11 +118,11 @@ public class CloudinaryServiceImpl implements CloudinaryService {
             Map<?, ?> rawResult = cloudinary.uploader().upload(dataUri, uploadOptions);
             String secureUrl = rawResult.get("secure_url").toString();
 
-            logger.info("Successfully uploaded and optimized image to Cloudinary: {}", secureUrl);
+            log.info("Successfully uploaded and optimized image to Cloudinary: {}", secureUrl);
             return secureUrl;
 
         } catch (Exception e) {
-            logger.error("Failed to upload base64 image to Cloudinary", e);
+            log.error("Failed to upload base64 image to Cloudinary", e);
             throw new IOException("Failed to upload image: " + e.getMessage(), e);
         }
     }
