@@ -88,52 +88,67 @@ public class CloudinaryServiceImpl implements CloudinaryService {
     }
     public String uploadBase64(String base64Image) throws IOException {
         try {
-            System.out.println("uploadBase64 çağrıldı");
+            log.error("UPLOAD_BASE64 - method called");
 
-            log.info("Starting base64 image upload to Cloudinary");
-
-            // Validate base64 string
-            if (base64Image == null || base64Image.trim().isEmpty()) {
-                System.out.println("Base64 image string null veya boş!");
-                throw new IllegalArgumentException("Base64 image string cannot be null or empty");
+            // 1️⃣ Base64 validation
+            if (base64Image == null) {
+                log.error("UPLOAD_BASE64 - base64Image is NULL");
+                throw new IllegalArgumentException("Base64 image string is null");
             }
-            System.out.println("Base64 string uzunluğu: " + base64Image.length());
 
-            // Check if the base64 string already has the data URI prefix
+            log.error("UPLOAD_BASE64 - base64 length: {}", base64Image.length());
+
+            if (base64Image.trim().isEmpty()) {
+                log.error("UPLOAD_BASE64 - base64Image is EMPTY");
+                throw new IllegalArgumentException("Base64 image string is empty");
+            }
+
+            // 2️⃣ Data URI handling
             String dataUri;
             if (base64Image.startsWith("data:")) {
                 dataUri = base64Image;
-                System.out.println("Base64 zaten data URI ile başlıyor");
+                log.error("UPLOAD_BASE64 - base64 already has data URI prefix");
             } else {
                 dataUri = "data:image/jpeg;base64," + base64Image;
-                System.out.println("Base64'a data URI prefix eklendi");
+                log.error("UPLOAD_BASE64 - data URI prefix added manually");
             }
 
-            log.debug("Uploading image with data URI prefix: {}", dataUri.substring(0, Math.min(50, dataUri.length())));
-            System.out.println("Cloudinary upload başlıyor");
+            log.error(
+                    "UPLOAD_BASE64 - dataUri preview: {}",
+                    dataUri.substring(0, Math.min(80, dataUri.length()))
+            );
 
+            // 3️⃣ Upload options
             Map<String, Object> uploadOptions = new HashMap<>();
-            uploadOptions.put("quality", "auto:good");
+            /*uploadOptions.put("quality", "auto:good");
             uploadOptions.put("fetch_format", "auto");
             uploadOptions.put("width", 1200);
             uploadOptions.put("height", 1200);
             uploadOptions.put("crop", "limit");
             uploadOptions.put("flags", "progressive");
             uploadOptions.put("resource_type", "image");
+*/
+            log.error("UPLOAD_BASE64 - calling Cloudinary uploader");
 
+            // 4️⃣ Upload
             Map<?, ?> rawResult = cloudinary.uploader().upload(dataUri, uploadOptions);
-            String secureUrl = rawResult.get("secure_url").toString();
 
+            log.error("UPLOAD_BASE64 - Cloudinary response keys: {}", rawResult.keySet());
 
-            log.info("Successfully uploaded and optimized image to Cloudinary: {}", secureUrl);
-            System.out.println("Cloudinary upload başarılı, url: " + secureUrl);
+            Object secureUrlObj = rawResult.get("secure_url");
+            if (secureUrlObj == null) {
+                log.error("UPLOAD_BASE64 - secure_url is NULL, rawResult: {}", rawResult);
+                throw new RuntimeException("Cloudinary response missing secure_url");
+            }
+
+            String secureUrl = secureUrlObj.toString();
+            log.error("UPLOAD_BASE64 - upload SUCCESS, secureUrl: {}", secureUrl);
+
             return secureUrl;
 
         } catch (Exception e) {
-            System.out.println("Cloudinary base64 upload sırasında hata oluştu: " + e.getMessage());
-            e.printStackTrace();
-            log.error("Failed to upload base64 image to Cloudinary", e);
-            throw new IOException("Failed to upload image: " + e.getMessage(), e);
+            log.error("UPLOAD_BASE64 - EXCEPTION CAUGHT", e);
+            throw new IOException("Failed to upload image to Cloudinary", e);
         }
     }
 }
