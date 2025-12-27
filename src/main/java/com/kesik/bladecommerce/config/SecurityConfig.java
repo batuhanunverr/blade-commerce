@@ -128,7 +128,7 @@ public class SecurityConfig {
     }
     @PostConstruct
     public void init() {
-        System.out.println("🔥 LOCAL SECURITY CONFIG ACTIVE 🔥");
+        System.out.println("🔥 PROD SECURITY CONFIG ACTIVE 🔥");
     }
 
 
