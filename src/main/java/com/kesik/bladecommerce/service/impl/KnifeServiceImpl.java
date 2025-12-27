@@ -311,14 +311,34 @@ public class KnifeServiceImpl implements KnifeService {
         try {
             String imageUrl = null;
 
+            System.out.println("handleImageUpload çağrıldı");
+            if (imageFile != null) {
+                System.out.println("imageFile null değil, isEmpty: " + imageFile.isEmpty());
+            } else {
+                System.out.println("imageFile null");
+            }
+            if (imageBase64 != null) {
+                System.out.println("imageBase64 uzunluğu: " + imageBase64.length());
+            } else {
+                System.out.println("imageBase64 null");
+            }
+
             if (imageFile != null && !imageFile.isEmpty()) {
+                System.out.println("Dosya ile upload başlıyor");
                 imageUrl = cloudinaryService.uploadFile(imageFile);
+                System.out.println("Dosya ile upload tamamlandı, url: " + imageUrl);
             } else if (imageBase64 != null && !imageBase64.isEmpty()) {
+                System.out.println("Base64 ile upload başlıyor");
                 imageUrl = cloudinaryService.uploadBase64(imageBase64);
+                System.out.println("Base64 ile upload tamamlandı, url: " + imageUrl);
+            } else {
+                System.out.println("Ne dosya ne base64 geldi, upload yapılmadı");
             }
 
             return imageUrl;
         } catch (Exception e) {
+            System.out.println("Cloudinary upload sırasında hata oluştu: " + e.getMessage());
+            e.printStackTrace();
             log.error("Cloudinary upload failed", e);
             throw new RuntimeException("Error uploading image to server", e);
         }
