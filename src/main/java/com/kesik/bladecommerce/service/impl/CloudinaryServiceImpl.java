@@ -112,7 +112,6 @@ public class CloudinaryServiceImpl implements CloudinaryService {
             log.debug("Uploading image with data URI prefix: {}", dataUri.substring(0, Math.min(50, dataUri.length())));
             System.out.println("Cloudinary upload başlıyor");
 
-            // Configure Cloudinary upload with optimization (same as uploadFile)
             Map<String, Object> uploadOptions = new HashMap<>();
             uploadOptions.put("quality", "auto:good");
             uploadOptions.put("fetch_format", "auto");
@@ -120,9 +119,11 @@ public class CloudinaryServiceImpl implements CloudinaryService {
             uploadOptions.put("height", 1200);
             uploadOptions.put("crop", "limit");
             uploadOptions.put("flags", "progressive");
+            uploadOptions.put("resource_type", "image");
 
             Map<?, ?> rawResult = cloudinary.uploader().upload(dataUri, uploadOptions);
             String secureUrl = rawResult.get("secure_url").toString();
+
 
             log.info("Successfully uploaded and optimized image to Cloudinary: {}", secureUrl);
             System.out.println("Cloudinary upload başarılı, url: " + secureUrl);
