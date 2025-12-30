@@ -16,7 +16,7 @@ public class CorsConfig {
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
 
-            @Override
+            /*@Override
             public void addCorsMappings(CorsRegistry registry) {
 
                 registry.addMapping("/swagger-ui/**")
@@ -38,6 +38,20 @@ public class CorsConfig {
                         .allowedHeaders("*")
                         .allowCredentials(true)
                         .exposedHeaders("Authorization", "Content-Type")
+                        .maxAge(3600);
+            }*/
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+
+                registry.addMapping("/**")
+                        .allowedOrigins(
+                                "http://localhost:3000",
+                                "https://kesik-bicakcilik.up.railway.app"
+                        )
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
+                        .allowedHeaders("*")
+                        .exposedHeaders("Authorization")
+                        .allowCredentials(true)
                         .maxAge(3600);
             }
         };
