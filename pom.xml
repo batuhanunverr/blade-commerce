@@ -117,6 +117,7 @@
 	</dependencies>
 
 	<build>
+		<finalName>bladecommerce</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
