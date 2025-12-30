@@ -15,24 +15,30 @@ public class CorsConfig {
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
+
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**")
-                        // Only allow specific origins (comma-separated)
-                        .allowedOrigins(allowedOrigins.split(","))
-                        // Only allow specific HTTP methods
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
-                        // Only allow specific headers
-                        .allowedHeaders("Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With")
-                        // Allow credentials (cookies, authorization headers)
-                        .allowCredentials(true)
-                        // Expose specific headers to the client
-                        .exposedHeaders("Authorization", "Content-Type")
-                        // Cache preflight requests for 1 hour
-                        .maxAge(3600);
-                registry.addMapping("/v3/api-docs/**").allowedOrigins("*"); //TODO kaldır
-                registry.addMapping("/swagger-ui/**").allowedOrigins("*"); //TODO kaldır
 
+                registry.addMapping("/swagger-ui/**")
+                        .allowedOriginPatterns("*")
+                        .allowedMethods("*")
+                        .allowedHeaders("*")
+                        .maxAge(3600);
+
+                registry.addMapping("/v3/api-docs/**")
+                        .allowedOriginPatterns("*")
+                        .allowedMethods("*")
+                        .allowedHeaders("*")
+                        .maxAge(3600);
+
+                // 🔐 API → SADECE izin verilen frontend domainleri
+                registry.addMapping("/**")
+                        .allowedOrigins(allowedOrigins.split(","))
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
+                        .allowedHeaders("*")
+                        .allowCredentials(true)
+                        .exposedHeaders("Authorization", "Content-Type")
+                        .maxAge(3600);
             }
         };
     }
