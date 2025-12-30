@@ -89,9 +89,9 @@ public class SecurityConfig {
                         // ===== ADMIN ONLY ENDPOINTS =====
 
                         // Product management (create, update, delete)
-                        .requestMatchers(HttpMethod.POST, "/api/knives/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/knives/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/knives/**").hasRole("ADMIN")
+                        //.requestMatchers(HttpMethod.POST, "/api/knives/**").hasRole("ADMIN")
+                        //.requestMatchers(HttpMethod.PUT, "/api/knives/**").hasRole("ADMIN")
+                        //.requestMatchers(HttpMethod.DELETE, "/api/knives/**").hasRole("ADMIN")
 
                         // Category management
                         .requestMatchers(HttpMethod.POST, "/api/categories/**").hasRole("ADMIN")

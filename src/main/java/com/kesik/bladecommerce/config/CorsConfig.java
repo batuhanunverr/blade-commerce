@@ -30,6 +30,9 @@ public class CorsConfig {
                         .exposedHeaders("Authorization", "Content-Type")
                         // Cache preflight requests for 1 hour
                         .maxAge(3600);
+                registry.addMapping("/v3/api-docs/**").allowedOrigins("*"); //TODO kaldır
+                registry.addMapping("/swagger-ui/**").allowedOrigins("*"); //TODO kaldır
+
             }
         };
     }
