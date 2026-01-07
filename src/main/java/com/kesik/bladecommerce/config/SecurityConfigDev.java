@@ -83,6 +83,9 @@ public class SecurityConfigDev {
                         // Order status list - for dropdowns
                         .requestMatchers(HttpMethod.GET, "/api/orders/status/all").permitAll()
 
+                        // Public order tracking - customers can track their orders via email link
+                        .requestMatchers(HttpMethod.GET, "/api/orders/track/**").permitAll()
+
                         // Social proof - recent purchases for trust building
                         // TODO: Consider rate limiting this endpoint to prevent abuse
                         .requestMatchers(HttpMethod.GET, "/api/social-proof/**").permitAll()
