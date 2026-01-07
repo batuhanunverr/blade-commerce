@@ -1,5 +1,6 @@
 package com.kesik.bladecommerce.config;
 
+import com.kesik.bladecommerce.dto.knife.KnifeDto;
 import com.kesik.bladecommerce.dto.order.OrderDto;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ public class MongoIndexConfig {
     @PostConstruct
     public void initIndexes() {
         createOrderIndexes();
+        createKnifeIndexes();
     }
 
     private void createOrderIndexes() {
@@ -54,5 +56,45 @@ public class MongoIndexConfig {
 
         mongoTemplate.indexOps(OrderDto.class)
             .ensureIndex(new Index("phoneNumber", Sort.Direction.ASC));
+    }
+
+    private void createKnifeIndexes() {
+        // Index for category filtering (most common filter)
+        mongoTemplate.indexOps(KnifeDto.class)
+            .ensureIndex(new Index("categoryId", Sort.Direction.ASC));
+
+        // Index for price range queries and sorting
+        mongoTemplate.indexOps(KnifeDto.class)
+            .ensureIndex(new Index("price", Sort.Direction.ASC));
+
+        // Index for discounted items
+        mongoTemplate.indexOps(KnifeDto.class)
+            .ensureIndex(new Index("discountPrice", Sort.Direction.ASC));
+
+        // Index for knife type filtering
+        mongoTemplate.indexOps(KnifeDto.class)
+            .ensureIndex(new Index("knifeType", Sort.Direction.ASC));
+
+        // Index for blade material filtering
+        mongoTemplate.indexOps(KnifeDto.class)
+            .ensureIndex(new Index("bladeMaterial", Sort.Direction.ASC));
+
+        // Index for stock queries
+        mongoTemplate.indexOps(KnifeDto.class)
+            .ensureIndex(new Index("stockQuantity", Sort.Direction.ASC));
+
+        // Compound index for category + price (common filter + sort)
+        mongoTemplate.indexOps(KnifeDto.class)
+            .ensureIndex(new Index()
+                .on("categoryId", Sort.Direction.ASC)
+                .on("price", Sort.Direction.ASC));
+
+        // Text index for product search
+        mongoTemplate.indexOps(KnifeDto.class)
+            .ensureIndex(new TextIndexDefinition.TextIndexDefinitionBuilder()
+                .onField("name")
+                .onField("description")
+                .onField("knifeType")
+                .build());
     }
 }

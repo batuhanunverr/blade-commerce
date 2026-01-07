@@ -63,7 +63,9 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
                                 "/swagger-resources/**",
-                                "/webjars/**"
+                                "/webjars/**",
+                                "/actuator/health",
+                                "/actuator/info"
                         ).permitAll()
                         // Authentication endpoints
                         .requestMatchers("/api/auth/**").permitAll()
@@ -92,9 +94,9 @@ public class SecurityConfig {
                         // ===== ADMIN ONLY ENDPOINTS =====
 
                         // Product management (create, update, delete)
-                        //.requestMatchers(HttpMethod.POST, "/api/knives/**").hasRole("ADMIN")
-                        //.requestMatchers(HttpMethod.PUT, "/api/knives/**").hasRole("ADMIN")
-                        //.requestMatchers(HttpMethod.DELETE, "/api/knives/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/knives/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/knives/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/knives/**").hasRole("ADMIN")
 
                         // Category management
                         .requestMatchers(HttpMethod.POST, "/api/categories/**").hasRole("ADMIN")
