@@ -68,9 +68,17 @@ public class OrderController {
         return orderService.getAllOrders();
     }
 
-    // Get order by ID
+    // Get order by ID (admin only)
     @GetMapping("/{id}")
     public Optional<OrderDto> getOrderById(@PathVariable String id) {
+        return orderService.getOrderById(id);
+    }
+
+    // Public order tracking for customers (no auth required)
+    // Returns limited order info for customer tracking via email link
+    @GetMapping("/track/{id}")
+    public Optional<OrderDto> trackOrder(@PathVariable String id) {
+        log.info("Public order tracking request for: {}", id);
         return orderService.getOrderById(id);
     }
 
