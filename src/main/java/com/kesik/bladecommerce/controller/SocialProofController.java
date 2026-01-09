@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -176,8 +177,20 @@ public class SocialProofController {
      */
     private String calculateTimeAgo(String orderDateStr) {
         try {
-            // Parse order date (format from MongoDB: "2024-12-06T15:30:00")
-            LocalDateTime orderDate = LocalDateTime.parse(orderDateStr, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+            LocalDateTime orderDate;
+
+            if (orderDateStr.length() == 10) {
+                // Format: yyyy-MM-dd
+                orderDate = LocalDate.parse(orderDateStr)
+                        .atStartOfDay();
+            } else {
+                // Format: yyyy-MM-ddTHH:mm:ss
+                orderDate = LocalDateTime.parse(
+                        orderDateStr,
+                        DateTimeFormatter.ISO_LOCAL_DATE_TIME
+                );
+            }
+
             Duration duration = Duration.between(orderDate, LocalDateTime.now());
 
             long minutes = duration.toMinutes();
@@ -203,7 +216,7 @@ public class SocialProofController {
 
             return "geçen ay";
 
-        } catch (DateTimeParseException e) {
+        } catch (Exception e) {
             log.warn("Could not parse order date: {}", orderDateStr, e);
             return "kısa süre önce";
         }
