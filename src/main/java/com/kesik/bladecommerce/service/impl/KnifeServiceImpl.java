@@ -166,21 +166,43 @@ public class KnifeServiceImpl implements KnifeService {
 
     @Override
     public KnifeDto updateKnife(String id, UpdateKnifeRequestDto knifeDto) {
+        System.out.println("=== updateKnife START ===");
+        System.out.println("Knife ID: " + id);
+
         KnifeDto existingKnife = knifeRepository.findById(id).orElse(null);
-        if (existingKnife == null) return null;
+
+        if (existingKnife == null) {
+            System.out.println("❌ Knife bulunamadı, update iptal");
+            return null;
+        }
+
+        System.out.println("✅ Mevcut knife bulundu: " + existingKnife.getName());
 
         // Validate and normalize pricing
+        System.out.println("➡️ Fiyat validasyonu başlıyor");
         validateAndNormalizePricing(knifeDto);
+        System.out.println("✅ Fiyat validasyonu tamamlandı");
 
+        // Update fields
+        System.out.println("➡️ Knife alanları güncelleniyor");
         updateKnifeFields(existingKnife, knifeDto);
+        System.out.println("✅ Alanlar güncellendi");
 
         // Handle image upload
+        System.out.println("➡️ Image upload kontrolü");
         String imageUrl = handleImageUpload(knifeDto.getImageFile(), knifeDto.getImageBase64());
         if (imageUrl != null) {
             existingKnife.setImageUrl(imageUrl);
+            System.out.println("✅ Yeni imageUrl set edildi: " + imageUrl);
+        } else {
+            System.out.println("ℹ️ Image güncellenmedi");
         }
 
-        return knifeRepository.save(existingKnife);
+        KnifeDto savedKnife = knifeRepository.save(existingKnife);
+        System.out.println("✅ Knife başarıyla update edildi: " + savedKnife.getId());
+        System.out.println("=== updateKnife END ===");
+
+        return savedKnife;
     }
 
     private void updateKnifeFields(KnifeDto knife, UpdateKnifeRequestDto dto) {
@@ -282,8 +304,20 @@ public class KnifeServiceImpl implements KnifeService {
 
     @Override
     public void deleteKnife(String id) {
+        System.out.println("=== deleteKnife START ===");
+        System.out.println("Knife ID: " + id);
+
+        boolean exists = knifeRepository.existsById(id);
+        if (!exists) {
+            System.out.println("❌ Knife bulunamadı, delete yapılmadı");
+            return;
+        }
+
         knifeRepository.deleteById(id);
+        System.out.println("✅ Knife başarıyla silindi: " + id);
+        System.out.println("=== deleteKnife END ===");
     }
+
 
     @Override
     public List<String> getKnifeTypes() {
