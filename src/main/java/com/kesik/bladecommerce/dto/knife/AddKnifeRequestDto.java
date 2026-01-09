@@ -20,7 +20,7 @@ public class AddKnifeRequestDto {
     private Integer categoryId;
 
     @NotBlank(message = "Description is required")
-    @Size(max = 1000, message = "Description must not exceed 1000 characters")
+    @Size(max = 2500, message = "Description must not exceed 1000 characters")
     private String description;
 
     @Positive(message = "Price must be positive")
