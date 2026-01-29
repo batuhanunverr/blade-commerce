@@ -91,6 +91,9 @@ public class SecurityConfig {
                         // TODO: Consider rate limiting this endpoint to prevent abuse
                         .requestMatchers(HttpMethod.GET, "/api/social-proof/**").permitAll()
 
+                        // Corporate content - public pages (about, terms, privacy, etc.)
+                        .requestMatchers(HttpMethod.GET, "/api/content/public/**").permitAll()
+
                         // ===== ADMIN ONLY ENDPOINTS =====
 
                         // Product management (create, update, delete)
@@ -115,6 +118,9 @@ public class SecurityConfig {
 
                         // Single order by ID - admin only (customers don't have accounts)
                         .requestMatchers(HttpMethod.GET, "/api/orders/{id}").hasRole("ADMIN")
+
+                        // Corporate content management (admin only)
+                        .requestMatchers("/api/content/admin/**").hasRole("ADMIN")
 
                         // Admin statistics and management endpoints
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
