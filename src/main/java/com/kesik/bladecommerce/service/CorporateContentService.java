@@ -27,8 +27,7 @@ public class CorporateContentService {
 
     // Public: Tüm aktif içerikleri getir
     public List<CorporateContent> getAllPublicContents() {
-        List<CorporateContent> result =  repository.findAll();
-        return result;
+        return repository.findAllByActiveTrue();
     }
 
     // Admin: Tüm içerikleri listele

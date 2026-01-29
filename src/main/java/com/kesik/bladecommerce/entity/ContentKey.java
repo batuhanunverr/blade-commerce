@@ -8,5 +8,10 @@ public enum ContentKey {
     MAINTENANCE_GUIDE,      // Bakım Rehberi
     ALL_PRODUCTS_INFO,      // Tüm Ürünler (bilgilendirme)
     ABOUT_US,               // Hakkımızda
-    CONTACT_INFO            // İletişim (Tel, Adres, Email JSON olarak tutulabilir)
+    CONTACT_INFO,           // İletişim (Tel, Adres, Email JSON olarak tutulabilir)
+    TERMS,                  // Mesafeli Satış Sözleşmesi
+    PRIVACY,                // Gizlilik & KVKK
+    COOKIES,                // Çerez Politikası
+    PRE_INFO,               // Ön Bilgilendirme Formu
+    DISCLAIMER              // Kullanım ve Sorumluluk Reddi
 }
