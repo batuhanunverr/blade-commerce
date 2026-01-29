@@ -13,5 +13,6 @@ public enum ContentKey {
     PRIVACY,                // Gizlilik & KVKK
     COOKIES,                // Çerez Politikası
     PRE_INFO,               // Ön Bilgilendirme Formu
-    DISCLAIMER              // Kullanım ve Sorumluluk Reddi
+    DISCLAIMER,             // Kullanım ve Sorumluluk Reddi
+    SOCIAL_LINKS            // Sosyal Medya Linkleri (JSON: instagram, facebook, twitter, youtube, tiktok)
 }
