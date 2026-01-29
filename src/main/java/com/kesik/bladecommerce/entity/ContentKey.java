@@ -6,6 +6,7 @@ public enum ContentKey {
     WARRANTY_CONDITIONS,    // Garanti Koşulları
     FAQ,                    // Sıkça Sorulan Sorular
     MAINTENANCE_GUIDE,      // Bakım Rehberi
+    ALL_PRODUCTS_INFO,      // Tüm Ürünler (bilgilendirme)
     ABOUT_US,               // Hakkımızda
     CONTACT_INFO,           // İletişim (JSON: phone, email, address, workingHours)
     TERMS,                  // Mesafeli Satış Sözleşmesi
