@@ -20,4 +20,6 @@ public class OrderRequestDto {
     private String currency;
     private String paidPrice;
     private String paymentId;
+    private Double shippingCost; // Shipping cost (0 if free shipping)
+    private Double subtotal; // Product total before shipping/tax
 }

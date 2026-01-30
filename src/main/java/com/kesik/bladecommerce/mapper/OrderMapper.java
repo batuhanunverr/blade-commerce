@@ -64,7 +64,9 @@ public class OrderMapper {
             );
 
             try {
-                orderDto.setTotalAmount(Double.parseDouble(orderRequest.getPrice()));
+                orderDto.setTotalAmount(Double.parseDouble(orderRequest.getPaidPrice())); // Use paidPrice (includes shipping + tax)
+                orderDto.setSubtotal(orderRequest.getSubtotal()); // Product subtotal before shipping/tax
+                orderDto.setShippingCost(orderRequest.getShippingCost()); // Shipping cost (0 if free)
             } catch (NumberFormatException e) {
                 log.info("Invalid price format: {}", orderRequest.getPrice());
                 throw new IllegalArgumentException("Invalid price format: " + orderRequest.getPrice(), e);

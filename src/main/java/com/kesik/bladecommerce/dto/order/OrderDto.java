@@ -22,6 +22,8 @@ public class OrderDto {
     private String shippingAddress;
     private String billingAddress;
     private Double totalAmount;
+    private Double shippingCost; // Shipping cost (0 if free shipping applied)
+    private Double subtotal; // Product total before shipping/tax
     private List<KnifeOrderDto> knives;
     private String history;
     private String userName;
