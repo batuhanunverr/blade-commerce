@@ -62,6 +62,10 @@ public class CategoryController {
                 Map<String, Object> categoryWithCount = new HashMap<>();
                 categoryWithCount.put("categoryId", category.getCategoryId());
                 categoryWithCount.put("categoryName", category.getCategoryName());
+                categoryWithCount.put("description", category.getDescription());
+                categoryWithCount.put("icon", category.getIcon());
+                categoryWithCount.put("displayOrder", category.getDisplayOrder());
+                categoryWithCount.put("isActive", category.getIsActive() != null ? category.getIsActive() : true);
                 categoryWithCount.put("productCount", knifeService.getKnifeCountByCategory(String.valueOf(category.getCategoryId())));
                 return categoryWithCount;
             })
